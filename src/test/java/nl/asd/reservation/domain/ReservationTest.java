@@ -73,6 +73,23 @@ class ReservationTest {
 
     @Test
     public void shouldChangeReservationCorrectly() {
+        var reservation = repository.ofId(new ReservationId(1));
+        var newWorkplace = new WorkplaceId(500L);
+
+        // check if new workplace is different from original workplace.
+        // check if new workplace is not in use on selected timeslots.
+        // swap new workplace in.
+        reservation.changeWorkplace(newWorkplace);
+
+        assertEquals(newWorkplace, reservation.getWorkplace());
+    }
+
+    @Test
+    public void shouldThrowWhenWorkSpaceIsInUseOnSelectedTimeslot() {
+        var reservation = repository.ofId(new ReservationId(1));
+        var secondReservation = repository.ofId(new ReservationId(2));
+
+        assertThrows(RuntimeException.class, ()-> reservation.changeWorkplace(secondReservation.getWorkplace()));
     }
 
     @Test
