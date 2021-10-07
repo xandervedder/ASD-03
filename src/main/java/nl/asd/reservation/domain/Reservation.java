@@ -105,6 +105,8 @@ public class Reservation {
             if (reservation.slots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
                 throw new RuntimeException("This has already been reserved");
             }
+
+
         }
 
         this.slots.add(timeslot);
@@ -118,10 +120,8 @@ public class Reservation {
 
     public boolean conflictsWith(Reservation other) {
         for(var slot : this.slots) {
-            for(var otherSlot : other.slots) {
-                if(slot.conflictsWith(otherSlot)) {
-                    return true;
-                }
+            if(slot.conflictsWith(other.slots)) {
+                return true;
             }
         }
         return false;

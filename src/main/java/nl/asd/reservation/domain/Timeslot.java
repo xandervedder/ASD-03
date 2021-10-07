@@ -22,6 +22,15 @@ public record Timeslot(LocalTime from, LocalTime to) {
         return ChronoUnit.MINUTES.between(this.from, this.to);
     }
 
+    public boolean conflictsWith(List<Timeslot> others) {
+        for(var slot : others) {
+            if(this.conflictsWith(slot)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean conflictsWith(Timeslot other) {
         return
                 // begindatum huidige voor andere einddatum
