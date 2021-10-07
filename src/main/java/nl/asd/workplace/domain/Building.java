@@ -1,12 +1,26 @@
 package nl.asd.workplace.domain;
 
-public class Building {
-    private long id;
-    private String name;
+import nl.asd.shared.id.BuildingId;
 
-    public Building(long id, String name) {
+import java.util.HashMap;
+
+public class Building {
+    private BuildingId id;
+    private String name;
+    private HashMap<Day, OpeningHours> openingHours;
+
+    public Building(BuildingId id, String name, HashMap<Day, OpeningHours> openingHours) {
         this.id = id;
         this.name = name;
+        this.openingHours = openingHours;
+    }
+
+    public BuildingId getId() {
+        return id;
+    }
+
+    public void setId(BuildingId id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -15,5 +29,13 @@ public class Building {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public HashMap<Day, OpeningHours> getOpeningHours() {
+        return openingHours;
+    }
+
+    public void setOpeningHours(HashMap<Day, OpeningHours> openingHours) {
+        this.openingHours = openingHours;
     }
 }

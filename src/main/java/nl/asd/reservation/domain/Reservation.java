@@ -1,20 +1,20 @@
 package nl.asd.reservation.domain;
 
-import nl.asd.workplace.domain.WorkplaceId;
+import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Reservation {
-    private long id;
+    private ReservationId id;
     private LocalDate createdAt;
     private ReservationType type;
     private List<Timeslot> slots;
 
     private WorkplaceId workplace;
 
-    public Reservation(long id, LocalDate createdAt, ReservationType type, WorkplaceId workplace) {
+    public Reservation(ReservationId id, LocalDate createdAt, ReservationType type, WorkplaceId workplace) {
         // w.i.p. validatie
         this.id = id;
         this.createdAt = createdAt;
@@ -24,11 +24,11 @@ public class Reservation {
         this.workplace = workplace;
     }
 
-    public long getId() {
+    public ReservationId getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(ReservationId id) {
         this.id = id;
     }
 
@@ -79,18 +79,13 @@ public class Reservation {
 
         // Tevens willen we ook zien of een andere reservation op
         // dezelfde workplace al een reservatie heeft zitten...
-        var reservations = repository.findAll();
+        var reservations = repository.findByWorkplace(this.workplace);
         for (var reservation : reservations) {
-            if (!reservation.workplace.equals(this.workplace)) {
-                continue;
-            }
-
-            // Bepaal de gewenste timeslot in de andere timeslots zit (conflicteert)
+            // Bepaal of de gewenste timeslot in de andere timeslots zit (conflicteert met)
             var timeslots = reservation.slots;
             if (timeslots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
                 throw new RuntimeException("This has already been reserved");
             }
-
         }
 
         this.slots.add(timeslot);
