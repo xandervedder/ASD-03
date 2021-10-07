@@ -116,6 +116,34 @@ public class Reservation {
         }
     }
 
+    public boolean conflictsWith(Reservation other) {
+        for(var slot : this.slots) {
+            for(var otherSlot : other.slots) {
+                if(slot.conflictsWith(otherSlot)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // DONE: check if new workplace is different from original workplace.
+    // TODO Jort: check if new workplace is not in use on selected timeslots.
+    // TODO Jort: swap new workplace in.
+    public void changeWorkplace(WorkplaceId newWorkplaceId, ReservationRepository repository) {
+        if(this.workplace.equals(newWorkplaceId)) {
+            throw new RuntimeException("This reservation already uses this workplace");
+        }
+
+        for (var reservation : repository.findByWorkplace(newWorkplaceId)) {
+            if(this.conflictsWith(reservation)) {
+                throw new RuntimeException("This reservation can't occupy a used timeslot");
+            }
+        }
+
+        this.workplace = newWorkplaceId;
+    }
+
     //checks if the day of cancellation is not the same day as the reservation
     public boolean isCancellationAllowed(LocalDate cancelDate) {
         return cancelDate.getYear() == this.reservationDate.getYear() &&
