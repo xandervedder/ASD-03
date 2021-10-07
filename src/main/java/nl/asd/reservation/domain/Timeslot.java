@@ -22,6 +22,7 @@ public record Timeslot(LocalTime from, LocalTime to) {
         return ChronoUnit.MINUTES.between(this.from, this.to);
     }
 
+    // Checks if this slot conflicts with a number of different timeslots
     public boolean conflictsWith(List<Timeslot> others) {
         for(var slot : others) {
             if(this.conflictsWith(slot)) {

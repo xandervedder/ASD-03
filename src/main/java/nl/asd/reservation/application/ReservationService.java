@@ -47,4 +47,11 @@ public class ReservationService {
 
         this.repository.delete(reservation);
     }
+
+    public ReservationId changeWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
+        var reservation = this.repository.ofId(id);
+        reservation.changeWorkplace(newWorkplaceId, repository);
+
+        return reservation.getId();
+    }
 }
