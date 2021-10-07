@@ -6,6 +6,22 @@ import java.util.Objects;
 
 // https://docs.oracle.com/en/java/javase/14/language/records.html
 public record Timeslot(LocalTime from, LocalTime to) {
+    public Timeslot {
+        if (!from.getDayOfWeek().equals(to.getDayOfWeek())) {
+            throw new RuntimeException("Timeslot should be on the same day");
+        }
+
+        if (ChronoUnit.MINUTES.between(from, to) != 30) {
+            throw new RuntimeException("Timeslot should be 30 minutes");
+        }
+
+        var fromMinute = from.getMinute();
+        var toMinute = to.getMinute();
+        if (!(fromMinute == 0 || fromMinute == 30) || !(toMinute == 0 || toMinute == 30)) {
+            throw new RuntimeException("Timeslot should start at full hour or half hour");
+        }
+    }
+
     public long minutes() {
         return ChronoUnit.MINUTES.between(this.from, this.to);
     }
