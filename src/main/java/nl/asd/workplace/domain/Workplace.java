@@ -1,26 +1,25 @@
 package nl.asd.workplace.domain;
 
-import nl.asd.reservation.domain.ReservationId;
+import nl.asd.shared.id.WorkplaceId;
 
 import java.util.List;
 
 public class Workplace {
-    private long id;
+    private WorkplaceId id;
     private int number;
     private int floor;
-    private List<ReservationId> reservations;
 
-    public Workplace(long id, int number, int floor) {
+    public Workplace(WorkplaceId id, int number, int floor) {
         this.id = id;
         this.number = number;
         this.floor = floor;
     }
 
-    public long getId() {
+    public WorkplaceId getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(WorkplaceId id) {
         this.id = id;
     }
 
@@ -38,13 +37,5 @@ public class Workplace {
 
     public void setFloor(int floor) {
         this.floor = floor;
-    }
-
-    public void reserve(ReservationId reservation) {
-
-    }
-
-    public boolean isReserved() {
-        return false;
     }
 }

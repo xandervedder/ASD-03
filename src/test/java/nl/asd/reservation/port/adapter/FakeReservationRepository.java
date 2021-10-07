@@ -27,7 +27,7 @@ public class FakeReservationRepository implements ReservationRepository {
 
     @Override
     public List<Reservation> findAll() {
-        return new ArrayList<>(store.values());
+        return new ArrayList<>(this.store.values());
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FakeReservationRepository implements ReservationRepository {
 
     @Override
     public void save(Reservation reservation) {
-        store.put(reservation.getId(), reservation);
+        this.store.put(reservation.getId(), reservation);
     }
 
     @Override

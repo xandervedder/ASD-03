@@ -1,9 +1,10 @@
 package nl.asd.workplace.application;
 
-import nl.asd.shared.id.BuildingId;
+import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.domain.BuildingRepository;
 
-import java.util.List;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 
 public class BuildingService {
     private final BuildingRepository repository;
@@ -12,7 +13,8 @@ public class BuildingService {
         this.repository = repository;
     }
 
-    public List<String> openingHoursForBuilding(BuildingId id) {
-        return null;
+    public boolean isTimeOutsideOfOpeningHoursForGivenDay(WorkplaceId id, LocalDateTime from, LocalDateTime to) {
+        var building = repository.findByWorkplace(id);
+        return building.isTimeOutsideOfOpeningHoursForGivenDay(from.toLocalTime(), to.toLocalTime(), from.getDayOfWeek());
     }
 }

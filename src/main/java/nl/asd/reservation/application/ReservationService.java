@@ -18,14 +18,16 @@ public class ReservationService {
         this.buildingService = buildingService;
     }
 
+    // TODO: Multiple timeslots from given time range
     public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate reservationDate, LocalTime from, LocalTime to) {
-        // this.buildingService.openingHoursForBuilding(id, day)
-
+        // Throw here or at buildingService...?
+        if (this.buildingService.isTimeOutsideOfOpeningHoursForGivenDay(workplace, from, to)) {
+            throw new RuntimeException("Given time is not within opening hours range");
+        }
         var id = this.repository.nextId();
         var timeslot = new Timeslot(from, to);
         var reservation = new Reservation(id, LocalDate.now(), reservationDate, ReservationType.ONCE, workplace);
         reservation.reserveTimeslot(timeslot, this.repository);
-
         this.repository.save(reservation);
 
         // Mag dit?

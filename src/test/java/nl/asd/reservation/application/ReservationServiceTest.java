@@ -6,11 +6,19 @@ import nl.asd.reservation.domain.ReservationId;
 import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
+import nl.asd.workplace.application.BuildingService;
+import nl.asd.workplace.domain.Building;
+import nl.asd.workplace.domain.OpeningTime;
+import nl.asd.workplace.domain.Workplace;
+import nl.asd.workplace.port.adapter.FakeBuildingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,13 +33,26 @@ class ReservationServiceTest {
 
     @BeforeEach
     public void initialize() {
-        this.repository = new FakeReservationRepository();
-        this.service = new ReservationService(this.repository, null);
+        var buildingRepository = new FakeBuildingRepository();
+        var openingHours = new HashMap<DayOfWeek, OpeningTime>();
+        openingHours.put(DayOfWeek.MONDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+        openingHours.put(DayOfWeek.TUESDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+        openingHours.put(DayOfWeek.WEDNESDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+        openingHours.put(DayOfWeek.THURSDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+        openingHours.put(DayOfWeek.FRIDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+        openingHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+        openingHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+
+        var building = new Building(buildingRepository.nextId(), "Test Building", openingHours);
+        building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
+        buildingRepository.save(building);
 
         this.workplace = new WorkplaceId(1L);
         this.reservationDate = LocalDate.now().plusDays(1);
         this.from = LocalTime.of(12, 30);
         this.to = LocalTime.of(13, 0);
+
+        this.service = new ReservationService(new FakeReservationRepository(), new BuildingService(buildingRepository));
     }
 
     @Test
@@ -61,5 +82,14 @@ class ReservationServiceTest {
     public void cancelReservationTooLateShouldThrowException() {
         var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), this.from, this.to);
         assertThrows(CancellationNotAllowedException.class, () -> this.service.cancelReservation(id));
+    }
+
+    @Test
+    public void shouldThrowBecauseOfIncompatibleTimeRange() {
+        var workplace = new WorkplaceId(1L);
+        var from = LocalDateTime.of(2021, 12, 8, 19, 30);
+        var to = LocalDateTime.of(2021, 12, 8, 20, 0);
+
+        assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, from, to));
     }
 }
