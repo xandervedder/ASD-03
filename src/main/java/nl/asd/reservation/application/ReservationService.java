@@ -1,5 +1,6 @@
 package nl.asd.reservation.application;
 
+import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
@@ -28,5 +29,12 @@ public class ReservationService {
 
         // Mag dit?
         return reservation.getId();
+    }
+
+    public void removeReservation(ReservationId reservation) {
+        if (this.repository.ofId(reservation) == null)
+            throw new ReservationNotFoundException("The reservation is not found!");
+
+        this.repository.removeById(reservation);
     }
 }
