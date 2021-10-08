@@ -52,7 +52,8 @@ class ReservationServiceTest {
         this.from = LocalTime.of(12, 30);
         this.to = LocalTime.of(13, 0);
 
-        this.service = new ReservationService(new FakeReservationRepository(), new BuildingService(buildingRepository));
+        this.repository = new FakeReservationRepository();
+        this.service = new ReservationService(this.repository, new BuildingService(buildingRepository));
     }
 
     @Test
@@ -87,9 +88,9 @@ class ReservationServiceTest {
     @Test
     public void shouldThrowBecauseOfIncompatibleTimeRange() {
         var workplace = new WorkplaceId(1L);
-        var from = LocalDateTime.of(2021, 12, 8, 19, 30);
-        var to = LocalDateTime.of(2021, 12, 8, 20, 0);
+        var from = LocalTime.of(19, 30);
+        var to = LocalTime.of(20, 0);
 
-        assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, from, to));
+        assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, LocalDate.now(), from, to));
     }
 }

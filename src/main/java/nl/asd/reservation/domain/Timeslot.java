@@ -7,10 +7,6 @@ import java.util.Objects;
 // https://docs.oracle.com/en/java/javase/14/language/records.html
 public record Timeslot(LocalTime from, LocalTime to) {
     public Timeslot {
-        if (!from.getDayOfWeek().equals(to.getDayOfWeek())) {
-            throw new RuntimeException("Timeslot should be on the same day");
-        }
-
         if (ChronoUnit.MINUTES.between(from, to) != 30) {
             throw new RuntimeException("Timeslot should be 30 minutes");
         }
