@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -15,6 +14,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ReservationTest {
     private ReservationRepository repository = new FakeReservationRepository();
+
+    /**
+     * Helper method that reduces code bloat and increases readability
+     * @return Time normalized to zero minutes
+     */
+    private LocalTime time() {
+        return LocalTime.now().withMinute(0);
+    }
 
     @BeforeEach
     public void initialize() {
@@ -46,7 +53,7 @@ class ReservationTest {
     @Test
     public void shouldShowTotalReservationTimeCorrectlyWithOneTimeslot() {
         var reservation = new Reservation(new ReservationId(0L), LocalDate.now(), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
-        var timeslot = new Timeslot(LocalTime.now().withMinute(0), LocalTime.now().withMinute(30));
+        var timeslot = new Timeslot(time(), time().plusMinutes(30));
         reservation.reserveTimeslot(timeslot, this.repository);
 
         assertEquals(30, reservation.totalMinutesReserved());
@@ -55,9 +62,9 @@ class ReservationTest {
     @Test
     public void shouldShowTotalReservationTimeCorrectlyWithMultipleTimeslots() {
         var reservation = new Reservation(new ReservationId(0L), LocalDate.now(), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
-        var timeslot1 = new Timeslot(LocalTime.now().withMinute(0), LocalTime.now().withMinute(0).plusMinutes(30));
-        var timeslot2 = new Timeslot(LocalTime.now().withMinute(0).plusMinutes(30), LocalTime.now().withMinute(0).plusMinutes(60));
-        var timeslot3 = new Timeslot(LocalTime.now().withMinute(0).plusMinutes(60), LocalTime.now().withMinute(0).plusMinutes(90));
+        var timeslot1 = new Timeslot(time(), time().plusMinutes(30));
+        var timeslot2 = new Timeslot(time().plusMinutes(30), time().plusMinutes(60));
+        var timeslot3 = new Timeslot(time().plusMinutes(60), time().plusMinutes(90));
 
         reservation.reserveTimeslots(List.of(timeslot1, timeslot2, timeslot3), this.repository);
 
@@ -67,7 +74,7 @@ class ReservationTest {
     @Test
     public void shouldThrowWhenReservingDuplicateTimeslots() {
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
-        var timeslot = new Timeslot(LocalTime.now().withMinute(0), LocalTime.now().withMinute(0).plusMinutes(30));
+        var timeslot = new Timeslot(time(), time().plusMinutes(30));
 
         reservation.reserveTimeslot(timeslot, this.repository);
 
@@ -89,7 +96,7 @@ class ReservationTest {
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));
 
         assertDoesNotThrow(() -> reservation.reserveTimeslot(
-                new Timeslot(LocalTime.now().withMinute(0).plusMinutes(60), LocalTime.now().withMinute(0).plusMinutes(90)), this.repository));
+                new Timeslot(time().plusMinutes(60), time().plusMinutes(90)), this.repository));
     }
 
     @Test
@@ -97,6 +104,6 @@ class ReservationTest {
         // workplaceid 1 is al in gebruik, timeslot niet
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));
 
-        assertDoesNotThrow(() -> reservation.reserveTimeslot(new Timeslot(LocalTime.now().withMinute(0).minusMinutes(90), LocalTime.now().withMinute(0).minusMinutes(60)), this.repository));
+        assertDoesNotThrow(() -> reservation.reserveTimeslot(new Timeslot(time().minusMinutes(90), time().minusMinutes(60)), this.repository));
     }
 }
