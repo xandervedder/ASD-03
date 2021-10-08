@@ -1,6 +1,7 @@
 package nl.asd.reservation.application;
 
 import nl.asd.reservation.ReservationNotFoundException;
+import nl.asd.reservation.CancellationNotAllowedException;
 import nl.asd.reservation.domain.ReservationId;
 import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
@@ -39,20 +40,26 @@ class ReservationServiceTest {
     }
 
     @Test
-    public void shouldRemoveReservationCorrectly() {
+    public void shouldCancelReservationCorrectly() {
         var id = this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to);
         this.service.cancelReservation(id);
         assertEquals(0, this.repository.findAll().size());
     }
 
     @Test
-    public void removeReservationShouldNotThrowException() {
+    public void cancelReservationShouldNotThrowException() {
         var id = this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to);
         assertDoesNotThrow(() -> this.service.cancelReservation(id));
     }
 
     @Test
-    public void removeNonExistingReservationShouldThrowException() {
+    public void cancelNonExistingReservationShouldThrowException() {
         assertThrows(ReservationNotFoundException.class, () -> this.service.cancelReservation(new ReservationId(1000L)));
+    }
+
+    @Test
+    public void cancelReservationTooLateShouldThrowException() {
+        var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), this.from, this.to);
+        assertThrows(CancellationNotAllowedException.class, () -> this.service.cancelReservation(id));
     }
 }

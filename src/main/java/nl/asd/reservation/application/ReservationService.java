@@ -1,12 +1,12 @@
 package nl.asd.reservation.application;
 
+import nl.asd.reservation.CancellationNotAllowedException;
 import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class ReservationService {
@@ -32,10 +32,14 @@ public class ReservationService {
         return reservation.getId();
     }
 
-    public void cancelReservation(ReservationId reservation) {
-        if (this.repository.ofId(reservation) == null)
+    public void cancelReservation(ReservationId reservationId) {
+        var reservation = this.repository.ofId(reservationId);
+        if (reservation == null)
             throw new ReservationNotFoundException("The reservation is not found!");
 
-        this.repository.delete(this.repository.ofId(reservation));
+        if (!reservation.isCancellationAllowed(LocalDate.now()))
+            throw new CancellationNotAllowedException("You're too late to cancel!");
+
+        this.repository.delete(reservation);
     }
 }

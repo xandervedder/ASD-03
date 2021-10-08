@@ -102,4 +102,10 @@ public class Reservation {
             this.reserveTimeslot(slot, repository);
         }
     }
+
+    //checks if the day of cancellation is not the same day as the reservation
+    public boolean isCancellationAllowed(LocalDate cancelDate) {
+        return cancelDate.getYear() == this.date.getYear() &&
+                cancelDate.getDayOfYear() < this.date.getDayOfYear();
+    }
 }
