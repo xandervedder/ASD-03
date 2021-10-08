@@ -18,12 +18,12 @@ public class ReservationService {
         this.buildingService = buildingService;
     }
 
-    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate date, LocalTime from, LocalTime to) {
+    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate reservationDate, LocalTime from, LocalTime to) {
         // this.buildingService.openingHoursForBuilding(id, day)
 
         var id = this.repository.nextId();
         var timeslot = new Timeslot(from, to);
-        var reservation = new Reservation(id, LocalDate.now(), date, ReservationType.ONCE, workplace);
+        var reservation = new Reservation(id, LocalDate.now(), reservationDate, ReservationType.ONCE, workplace);
         reservation.reserveTimeslot(timeslot, this.repository);
 
         this.repository.save(reservation);
@@ -35,10 +35,10 @@ public class ReservationService {
     public void cancelReservation(ReservationId reservationId) {
         var reservation = this.repository.ofId(reservationId);
         if (reservation == null)
-            throw new ReservationNotFoundException("The reservation is not found!");
+            throw new ReservationNotFoundException("The reservation is not found");
 
         if (!reservation.isCancellationAllowed(LocalDate.now()))
-            throw new CancellationNotAllowedException("You're too late to cancel!");
+            throw new CancellationNotAllowedException("Reservation cannot be cancelled on the same day");
 
         this.repository.delete(reservation);
     }

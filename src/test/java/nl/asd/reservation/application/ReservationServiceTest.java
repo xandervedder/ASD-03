@@ -19,7 +19,7 @@ class ReservationServiceTest {
     private ReservationRepository repository;
 
     private WorkplaceId workplace;
-    private LocalDate date;
+    private LocalDate reservationDate;
     private LocalTime from;
     private LocalTime to;
 
@@ -29,26 +29,26 @@ class ReservationServiceTest {
         this.service = new ReservationService(this.repository, null);
 
         this.workplace = new WorkplaceId(1L);
-        this.date = LocalDate.now().plusDays(1);
+        this.reservationDate = LocalDate.now().plusDays(1);
         this.from = LocalTime.of(12, 30);
         this.to = LocalTime.of(13, 0);
     }
 
     @Test
     public void shouldCreateReservationCorrectly() {
-        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to));
+        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to));
     }
 
     @Test
     public void shouldCancelReservationCorrectly() {
-        var id = this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
         this.service.cancelReservation(id);
         assertEquals(0, this.repository.findAll().size());
     }
 
     @Test
     public void cancelReservationShouldNotThrowException() {
-        var id = this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
         assertDoesNotThrow(() -> this.service.cancelReservation(id));
     }
 

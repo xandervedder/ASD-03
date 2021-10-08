@@ -9,17 +9,17 @@ import java.util.List;
 public class Reservation {
     private ReservationId id;
     private LocalDate createdAt;
-    private LocalDate date;
+    private LocalDate reservationDate;
     private ReservationType type;
     private List<Timeslot> slots;
 
     private WorkplaceId workplace;
 
-    public Reservation(ReservationId id, LocalDate createdAt, LocalDate date, ReservationType type, WorkplaceId workplace) {
+    public Reservation(ReservationId id, LocalDate createdAt, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
         // w.i.p. validatie
         this.id = id;
         this.createdAt = createdAt;
-        this.date = date;
+        this.reservationDate = reservationDate;
         this.type = type;
         this.slots = new ArrayList<>();
 
@@ -42,9 +42,9 @@ public class Reservation {
         this.createdAt = createdAt;
     }
 
-    public LocalDate getDate() { return date; }
+    public LocalDate getReservationDate() { return reservationDate; }
 
-    public void setDate(LocalDate date) { this.date = date; }
+    public void setReservationDate(LocalDate reservationDate) { this.reservationDate = reservationDate; }
 
     public ReservationType getType() {
         return type;
@@ -105,7 +105,7 @@ public class Reservation {
 
     //checks if the day of cancellation is not the same day as the reservation
     public boolean isCancellationAllowed(LocalDate cancelDate) {
-        return cancelDate.getYear() == this.date.getYear() &&
-                cancelDate.getDayOfYear() < this.date.getDayOfYear();
+        return cancelDate.getYear() == this.reservationDate.getYear() &&
+                cancelDate.getDayOfYear() < this.reservationDate.getDayOfYear();
     }
 }
