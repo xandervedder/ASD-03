@@ -10,5 +10,5 @@ public interface ReservationRepository {
     List<Reservation> findAll();
     List<Reservation> findByWorkplace(WorkplaceId id);
     void save(Reservation reservation);
-    void removeById(ReservationId id);
+    void delete(Reservation reservation);
 }

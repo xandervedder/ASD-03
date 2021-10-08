@@ -43,7 +43,7 @@ public class FakeReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public void removeById(ReservationId id) {
-        store.remove(id);
+    public void delete(Reservation reservation) {
+        store.remove(reservation.getId());
     }
 }

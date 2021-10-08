@@ -31,10 +31,10 @@ public class ReservationService {
         return reservation.getId();
     }
 
-    public void removeReservation(ReservationId reservation) {
+    public void cancelReservation(ReservationId reservation) {
         if (this.repository.ofId(reservation) == null)
             throw new ReservationNotFoundException("The reservation is not found!");
 
-        this.repository.removeById(reservation);
+        this.repository.delete(this.repository.ofId(reservation));
     }
 }
