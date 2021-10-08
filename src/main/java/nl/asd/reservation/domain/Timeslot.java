@@ -1,11 +1,11 @@
 package nl.asd.reservation.domain;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 // https://docs.oracle.com/en/java/javase/14/language/records.html
-public record Timeslot(LocalDateTime from, LocalDateTime to) {
+public record Timeslot(LocalTime from, LocalTime to) {
     public long minutes() {
         return ChronoUnit.MINUTES.between(this.from, this.to);
     }

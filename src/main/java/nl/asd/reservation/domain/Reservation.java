@@ -9,15 +9,17 @@ import java.util.List;
 public class Reservation {
     private ReservationId id;
     private LocalDate createdAt;
+    private LocalDate date;
     private ReservationType type;
     private List<Timeslot> slots;
 
     private WorkplaceId workplace;
 
-    public Reservation(ReservationId id, LocalDate createdAt, ReservationType type, WorkplaceId workplace) {
+    public Reservation(ReservationId id, LocalDate createdAt, LocalDate date, ReservationType type, WorkplaceId workplace) {
         // w.i.p. validatie
         this.id = id;
         this.createdAt = createdAt;
+        this.date = date;
         this.type = type;
         this.slots = new ArrayList<>();
 
@@ -39,6 +41,10 @@ public class Reservation {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
+
+    public LocalDate getDate() { return date; }
+
+    public void setDate(LocalDate date) { this.date = date; }
 
     public ReservationType getType() {
         return type;

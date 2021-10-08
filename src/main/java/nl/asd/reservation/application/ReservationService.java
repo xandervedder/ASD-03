@@ -7,6 +7,7 @@ import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class ReservationService {
     private final ReservationRepository repository;
@@ -17,12 +18,12 @@ public class ReservationService {
         this.buildingService = buildingService;
     }
 
-    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDateTime from, LocalDateTime to) {
+    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate date, LocalTime from, LocalTime to) {
         // this.buildingService.openingHoursForBuilding(id, day)
 
         var id = this.repository.nextId();
         var timeslot = new Timeslot(from, to);
-        var reservation = new Reservation(id, LocalDate.now(), ReservationType.ONCE, workplace);
+        var reservation = new Reservation(id, LocalDate.now(), date, ReservationType.ONCE, workplace);
         reservation.reserveTimeslot(timeslot, this.repository);
 
         this.repository.save(reservation);

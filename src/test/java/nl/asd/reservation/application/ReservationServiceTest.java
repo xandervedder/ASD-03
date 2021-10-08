@@ -8,7 +8,8 @@ import nl.asd.shared.id.WorkplaceId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,8 +18,9 @@ class ReservationServiceTest {
     private ReservationRepository repository;
 
     private WorkplaceId workplace;
-    private LocalDateTime from;
-    private LocalDateTime to;
+    private LocalDate date;
+    private LocalTime from;
+    private LocalTime to;
 
     @BeforeEach
     public void initialize() {
@@ -26,25 +28,26 @@ class ReservationServiceTest {
         this.service = new ReservationService(this.repository, null);
 
         this.workplace = new WorkplaceId(1L);
-        this.from = LocalDateTime.of(2021, 12, 8, 12, 30);
-        this.to = LocalDateTime.of(2021, 12, 8, 13, 0);
+        this.date = LocalDate.now().plusDays(1);
+        this.from = LocalTime.of(12, 30);
+        this.to = LocalTime.of(13, 0);
     }
 
     @Test
     public void shouldCreateReservationCorrectly() {
-        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.from, this.to));
+        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to));
     }
 
     @Test
     public void shouldRemoveReservationCorrectly() {
-        var id = this.service.reserveWorkplace(this.workplace, this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to);
         this.service.cancelReservation(id);
         assertEquals(0, this.repository.findAll().size());
     }
 
     @Test
     public void removeReservationShouldNotThrowException() {
-        var id = this.service.reserveWorkplace(this.workplace, this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, this.date, this.from, this.to);
         assertDoesNotThrow(() -> this.service.cancelReservation(id));
     }
 
