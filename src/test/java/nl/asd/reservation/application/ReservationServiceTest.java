@@ -1,29 +1,65 @@
 package nl.asd.reservation.application;
 
+import nl.asd.reservation.ReservationNotFoundException;
+import nl.asd.reservation.CancellationNotAllowedException;
+import nl.asd.reservation.domain.ReservationId;
+import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
-import nl.asd.workplace.application.BuildingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReservationServiceTest {
     private ReservationService service;
+    private ReservationRepository repository;
+
+    private WorkplaceId workplace;
+    private LocalDate reservationDate;
+    private LocalTime from;
+    private LocalTime to;
 
     @BeforeEach
     public void initialize() {
-        this.service = new ReservationService(new FakeReservationRepository(), null);
+        this.repository = new FakeReservationRepository();
+        this.service = new ReservationService(this.repository, null);
+
+        this.workplace = new WorkplaceId(1L);
+        this.reservationDate = LocalDate.now().plusDays(1);
+        this.from = LocalTime.of(12, 30);
+        this.to = LocalTime.of(13, 0);
     }
 
     @Test
     public void shouldCreateReservationCorrectly() {
-        var workplace = new WorkplaceId(1L);
-        var from = LocalDateTime.of(2021, 12, 8, 12, 30);
-        var to = LocalDateTime.of(2021, 12, 8, 13, 0);
+        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to));
+    }
 
-        assertDoesNotThrow(() -> this.service.reserveWorkplace(workplace, from, to));
+    @Test
+    public void shouldCancelReservationCorrectly() {
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
+        this.service.cancelReservation(id);
+        assertEquals(0, this.repository.findAll().size());
+    }
+
+    @Test
+    public void cancelReservationShouldNotThrowException() {
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
+        assertDoesNotThrow(() -> this.service.cancelReservation(id));
+    }
+
+    @Test
+    public void cancelNonExistingReservationShouldThrowException() {
+        assertThrows(ReservationNotFoundException.class, () -> this.service.cancelReservation(new ReservationId(1000L)));
+    }
+
+    @Test
+    public void cancelReservationTooLateShouldThrowException() {
+        var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), this.from, this.to);
+        assertThrows(CancellationNotAllowedException.class, () -> this.service.cancelReservation(id));
     }
 }

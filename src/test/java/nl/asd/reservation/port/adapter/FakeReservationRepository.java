@@ -41,4 +41,9 @@ public class FakeReservationRepository implements ReservationRepository {
     public void save(Reservation reservation) {
         store.put(reservation.getId(), reservation);
     }
+
+    @Override
+    public void delete(Reservation reservation) {
+        store.remove(reservation.getId());
+    }
 }
