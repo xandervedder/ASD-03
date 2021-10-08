@@ -56,6 +56,10 @@ class ReservationServiceTest {
         reservation.reserveTimeslot(new Timeslot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)), this.repository);
         this.repository.save(reservation);
 
+        var reservation2 = new Reservation(new ReservationId(2L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(2L));
+        reservation2.reserveTimeslot(new Timeslot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)), this.repository);
+        this.repository.save(reservation2);
+
         this.repository = new FakeReservationRepository();
         this.service = new ReservationService(this.repository, new BuildingService(buildingRepository));
     }
@@ -100,11 +104,23 @@ class ReservationServiceTest {
 
     @Test
     public void shouldChangeWorkplaceCorrectly() {
-
-
         var reservation = this.repository.ofId(new ReservationId(1));
         this.service.changeWorkplace(reservation.getId(), new WorkplaceId(2));
 
         assertEquals(new WorkplaceId(2), this.repository.ofId(reservation.getId()).getWorkplace());
+    }
+
+    @Test
+    public void shouldThrowWhenNewWorkplaceIdIsEqualToCurrentWorkspaceId() {
+        var reservation = this.repository.ofId(new ReservationId(1));
+
+        assertThrows(RuntimeException.class, ()-> this.service.changeWorkplace(reservation.getId(), new WorkplaceId(1)));
+    }
+
+    @Test
+    public void shouldThrowWhenNewWorkplaceHasConflictingReservation() {
+        var reservation = this.repository.ofId(new ReservationId(1));
+
+        assertThrows(RuntimeException.class, ()-> this.service.changeWorkplace(reservation.getId(), new WorkplaceId(2)));
     }
 }
