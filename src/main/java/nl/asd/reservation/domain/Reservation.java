@@ -7,23 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Reservation {
+    private final LocalDate createdAt;
+    private final List<Timeslot> slots;
+
     private ReservationId id;
-    private LocalDate createdAt;
     private LocalDate reservationDate;
     private ReservationType type;
-    private List<Timeslot> slots;
-
     private WorkplaceId workplace;
 
-    public Reservation(ReservationId id, LocalDate createdAt, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
-        // w.i.p. validatie
-        this.id = id;
-        this.createdAt = createdAt;
-        this.reservationDate = reservationDate;
-        this.type = type;
+    public Reservation(ReservationId id, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
+        this.createdAt = LocalDate.now();
         this.slots = new ArrayList<>();
 
-        this.workplace = workplace;
+        this.setId(id);
+        this.setReservationDate(reservationDate);
+        this.setType(type);
+        this.setWorkplace(workplace);
     }
 
     public ReservationId getId() {
@@ -31,6 +30,10 @@ public class Reservation {
     }
 
     public void setId(ReservationId id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Cannot create reservation without an id");
+        }
+
         this.id = id;
     }
 
@@ -38,19 +41,31 @@ public class Reservation {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
+    public LocalDate getReservationDate() {
+        return reservationDate;
     }
 
-    public LocalDate getReservationDate() { return reservationDate; }
+    public void setReservationDate(LocalDate reservationDate) {
+        if (reservationDate == null) {
+            throw new IllegalArgumentException("Cannot create a reservation without a reservation date");
+        }
 
-    public void setReservationDate(LocalDate reservationDate) { this.reservationDate = reservationDate; }
+        if (reservationDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot create a reservation that is in the past");
+        }
+
+        this.reservationDate = reservationDate;
+    }
 
     public ReservationType getType() {
         return type;
     }
 
     public void setType(ReservationType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Cannot create a reservation without a reservation type");
+        }
+
         this.type = type;
     }
 
@@ -58,15 +73,15 @@ public class Reservation {
         return slots;
     }
 
-    public void setSlots(List<Timeslot> slots) {
-        this.slots = slots;
-    }
-
     public WorkplaceId getWorkplace() {
         return workplace;
     }
 
     public void setWorkplace(WorkplaceId workplace) {
+        if (workplace == null) {
+            throw new IllegalArgumentException("Cannot create a reservation without an associated workplace");
+        }
+
         this.workplace = workplace;
     }
 
@@ -89,6 +104,7 @@ public class Reservation {
         for (var reservation : reservations) {
             // Bepaal of de gewenste timeslot in de andere timeslots zit (conflicteert met)
             var timeslots = reservation.slots;
+            // TODO: compare by day
             if (timeslots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
                 throw new RuntimeException("This has already been reserved");
             }
