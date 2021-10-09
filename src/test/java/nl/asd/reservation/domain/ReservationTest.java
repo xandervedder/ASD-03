@@ -180,4 +180,23 @@ class ReservationTest {
 
         assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), reservation.getSlots());
     }
+
+    @Test
+    public void shouldChangeTimeslotsCorrectly() {
+        var reservation = new Reservation(new ReservationId(0L), LocalDate.now(), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
+
+        var oldTimeslot1 = new Timeslot(LocalTime.now(), LocalTime.now().plusMinutes(30));
+        var oldTimeslot2 = new Timeslot(LocalTime.now().plusMinutes(30), LocalTime.now().plusMinutes(60));
+        var oldTimeslot3 = new Timeslot(LocalTime.now().plusMinutes(60), LocalTime.now().plusMinutes(90));
+
+        reservation.reserveTimeslots(List.of(oldTimeslot1, oldTimeslot2, oldTimeslot3), this.repository);
+
+        var newTimeslot1 = new Timeslot(LocalTime.now(), LocalTime.now().plusMinutes(120));
+        var newTimeslot2 = new Timeslot(LocalTime.now().plusMinutes(120), LocalTime.now().plusMinutes(150));
+        var newTimeslot3 = new Timeslot(LocalTime.now().plusMinutes(150), LocalTime.now().plusMinutes(180));
+
+        reservation.changeTimeslot(List.of(newTimeslot1, newTimeslot2, newTimeslot3), this.repository);
+
+        assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), reservation.getSlots());
+    }
 }

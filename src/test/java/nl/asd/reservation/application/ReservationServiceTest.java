@@ -8,6 +8,7 @@ import nl.asd.reservation.domain.Timeslot;
 import nl.asd.shared.exception.CancellationNotAllowedException;
 import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
+import nl.asd.reservation.domain.Timeslot;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
@@ -22,6 +23,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
