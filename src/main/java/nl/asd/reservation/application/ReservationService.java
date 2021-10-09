@@ -26,9 +26,9 @@ public class ReservationService {
         }
 
         var id = this.repository.nextId();
-        var timeslot = new Timeslot(from, to);
+
         var reservation = new Reservation(id, reservationDate, ReservationType.ONCE, workplace);
-        reservation.reserveTimeslot(timeslot, this.repository);
+        reservation.reserveTimeslot(from, to, this.repository);
         this.repository.save(reservation);
 
         // Mag dit?

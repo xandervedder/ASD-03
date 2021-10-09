@@ -3,6 +3,7 @@ package nl.asd.reservation.domain;
 import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,20 +90,20 @@ public class Reservation {
         return slots.stream().map(Timeslot::minutes).reduce(0L, Long::sum);
     }
 
-    public void reserveTimeslot(Timeslot timeslot, ReservationRepository repository) {
-        // Validatie hier, we willen immers kijken of er een timeslot hierin zit die hetzelfde is
+    public void reserveTimeslot(LocalTime from, LocalTime to, ReservationRepository repository) {
+        var timeslot = new Timeslot(from, to);
+        // Check if we have the same slot already added to this reservation
         for (var slot : this.slots) {
             if (slot.equals(timeslot)) {
-                // Custom exception is hier ook beter...
+                // Custom exception would be better here..
                 throw new RuntimeException("This timeslot has already been added");
             }
         }
 
-        // Tevens willen we ook zien of een andere reservation op
-        // dezelfde workplace al een reservatie heeft zitten...
+        // We also would like to see
         var reservations = repository.findByWorkplace(this.workplace);
         for (var reservation : reservations) {
-            // Bepaal of de gewenste timeslot in de andere timeslots zit (conflicteert met)
+            // Check if other timeslots conflict with the given one
             var timeslots = reservation.slots;
             // TODO: compare by day
             if (timeslots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
@@ -113,9 +114,14 @@ public class Reservation {
         this.slots.add(timeslot);
     }
 
-    public void reserveTimeslots(List<Timeslot> slots, ReservationRepository repository) {
-        for (var slot : slots) {
-            this.reserveTimeslot(slot, repository);
+    public void reserveTimeslots(List<LocalTime> fromList, List<LocalTime> toList, ReservationRepository repository) {
+        // This should eventually be done with some type of object..
+        if (fromList.size() != toList.size()) {
+            throw new IllegalArgumentException("Time range lists should be of same size");
+        }
+
+        for (int i = 0; i < fromList.size(); i++) {
+            this.reserveTimeslot(fromList.get(i), toList.get(i), repository);
         }
     }
 
