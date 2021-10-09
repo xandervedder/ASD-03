@@ -1,23 +1,19 @@
 package nl.asd.reservation.application;
 
+import nl.asd.reservation.CancellationNotAllowedException;
+import nl.asd.reservation.ReservationNotFoundException;
+import nl.asd.reservation.domain.ReservationId;
+import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.shared.exception.CancellationNotAllowedException;
 import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
-import nl.asd.workplace.application.BuildingService;
-import nl.asd.workplace.domain.Building;
-import nl.asd.workplace.domain.OpeningTime;
-import nl.asd.workplace.domain.Workplace;
-import nl.asd.workplace.port.adapter.FakeBuildingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,6 +97,18 @@ class ReservationServiceTest {
         var to = LocalTime.of(20, 0);
 
         assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, LocalDate.now(), List.of(new Timeslot(from, to))));
+    }
+
+    @Test
+    public void shouldChangeTimeslotsCorrectly() {
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
+
+        var newTimeslot1 = new Timeslot(LocalTime.now(), LocalTime.now().plusMinutes(120));
+        var newTimeslot2 = new Timeslot(LocalTime.now().plusMinutes(120), LocalTime.now().plusMinutes(150));
+        var newTimeslot3 = new Timeslot(LocalTime.now().plusMinutes(150), LocalTime.now().plusMinutes(180));
+
+        this.service.changeTimeslotForExistingReservation(id, List.of(newTimeslot1, newTimeslot2, newTimeslot3));
+        assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), repository.ofId(id).getSlots());
     }
 
     @Test
