@@ -37,6 +37,15 @@ public class ReservationService {
         return reservation.getId();
     }
 
+    public void changeTimeslotForExistingReservation(ReservationId reservationId, List<Timeslot> newTimeslots) {
+        var reservation = this.repository.ofId(reservationId);
+        if (reservation == null)
+            throw new ReservationNotFoundException("The reservation is not found");
+        reservation.changeTimeslot(newTimeslots, this.repository);
+
+        this.repository.save(reservation);
+    }
+
     public void cancelReservation(ReservationId reservationId) {
         var reservation = this.repository.ofId(reservationId);
         if (reservation == null)

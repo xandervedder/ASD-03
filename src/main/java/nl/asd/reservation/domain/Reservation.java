@@ -90,6 +90,11 @@ public class Reservation {
         return slots.stream().map(Timeslot::minutes).reduce(0L, Long::sum);
     }
 
+    public void changeTimeslot(List<Timeslot> newSlots, ReservationRepository repository) {
+        reserveTimeslots(newSlots, repository);
+        this.slots = newSlots;
+    }
+
     public void reserveTimeslot(Timeslot timeslot, ReservationRepository repository) {
         // Check if we have the same slot already added to this reservation
         for (var slot : this.slots) {
