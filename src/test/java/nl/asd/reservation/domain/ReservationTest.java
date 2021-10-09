@@ -119,6 +119,12 @@ class ReservationTest {
     }
 
     @Test
+    public void shouldNotThrowWhenReservingATimeslotThatHasTheSameTimeOnAnotherDay() {
+        var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(2), ReservationType.ONCE, new WorkplaceId(1));
+        assertDoesNotThrow(() -> reservation.reserveTimeslot(time(), time().plusMinutes(30), this.repository));
+    }
+
+    @Test
     public void shouldNotThrowWhenReservingInATimeslotAfterOtherTimeslot() {
         // workplaceid 1 is al in gebruik, timeslot niet
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));

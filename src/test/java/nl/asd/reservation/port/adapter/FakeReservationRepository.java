@@ -5,6 +5,7 @@ import nl.asd.reservation.domain.ReservationId;
 import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +32,10 @@ public class FakeReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> findByWorkplace(WorkplaceId id) {
+    public List<Reservation> findByWorkplaceAndDate(WorkplaceId id, LocalDate date) {
         return this.store.values().stream()
-                .filter(reservation -> reservation.getWorkplace().equals(id))
+                .filter(reservation -> reservation.getWorkplace().equals(id) &&
+                        reservation.getReservationDate().equals(date))
                 .collect(Collectors.toList());
     }
 

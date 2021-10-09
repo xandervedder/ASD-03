@@ -100,13 +100,10 @@ public class Reservation {
             }
         }
 
-        // We also would like to see
-        var reservations = repository.findByWorkplace(this.workplace);
+        var reservations = repository.findByWorkplaceAndDate(this.workplace, this.reservationDate);
         for (var reservation : reservations) {
             // Check if other timeslots conflict with the given one
-            var timeslots = reservation.slots;
-            // TODO: compare by day
-            if (timeslots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
+            if (reservation.slots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
                 throw new RuntimeException("This has already been reserved");
             }
         }
