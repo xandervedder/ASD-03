@@ -9,6 +9,9 @@ import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReservationService {
     private final ReservationRepository repository;
