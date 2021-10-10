@@ -91,10 +91,10 @@ public class Reservation {
     }
 
     public void reserveTimeslot(LocalTime from, LocalTime to, ReservationRepository repository) {
-        var timeslot = new Timeslot(from, to);
+        var timeslots = Timeslot.ofTimeRange(from, to);
         // Check if we have the same slot already added to this reservation
-        for (var slot : this.slots) {
-            if (slot.equals(timeslot)) {
+        for (var slot : timeslots) {
+            if (this.slots.stream().anyMatch(s -> s.equals(slot))) {
                 // Custom exception would be better here..
                 throw new RuntimeException("This timeslot has already been added");
             }
@@ -102,17 +102,19 @@ public class Reservation {
 
         var reservations = repository.findByWorkplaceAndDate(this.workplace, this.reservationDate);
         for (var reservation : reservations) {
-            // Check if other timeslots conflict with the given one
-            if (reservation.slots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
-                throw new RuntimeException("This has already been reserved");
+            for (var slot : reservation.slots) {
+                // Check if other timeslots conflict with the given one
+                if (timeslots.stream().anyMatch(t -> t.conflictsWith(slot))) {
+                    throw new RuntimeException("This has already been reserved");
+                }
             }
         }
 
-        this.slots.add(timeslot);
+        this.slots.addAll(timeslots);
     }
 
     public void reserveTimeslots(List<LocalTime> fromList, List<LocalTime> toList, ReservationRepository repository) {
-        // This should eventually be done with some type of object..
+        // This should eventually be done with some type of object...
         if (fromList.size() != toList.size()) {
             throw new IllegalArgumentException("Time range lists should be of same size");
         }

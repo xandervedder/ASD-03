@@ -1,7 +1,7 @@
 package nl.asd.reservation.application;
 
-import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.CancellationNotAllowedException;
+import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.ReservationId;
 import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
@@ -14,10 +14,9 @@ import nl.asd.workplace.port.adapter.FakeBuildingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
