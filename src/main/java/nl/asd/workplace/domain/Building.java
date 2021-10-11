@@ -3,6 +3,7 @@ package nl.asd.workplace.domain;
 import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 
+import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -55,10 +56,13 @@ public class Building {
     }
 
     public void registerWorkplace(Workplace workplace) {
-        // TODO: add more business rules @JustMilan
         if (this.workplaces.contains(workplace)) {
             throw new RuntimeException("This building already contains this workplace");
         }
+
+        for (Workplace workplace1 : this.workplaces)
+            if (workplace1.getId().equals(workplace.getId()))
+                throw new RuntimeException(MessageFormat.format("Workplace with id: {0} already exists", workplace1.getId()));
 
         this.workplaces.add(workplace);
     }
@@ -90,5 +94,9 @@ public class Building {
 
     public void setOpeningHours(HashMap<DayOfWeek, OpeningTime> openingHours) {
         this.openingHours = openingHours;
+    }
+
+    public List<Workplace> getWorkplaces() {
+        return List.copyOf(workplaces);
     }
 }
