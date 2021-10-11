@@ -53,5 +53,3 @@ public class Workplace {
         return Objects.hash(id, number, floor);
     }
 }
-
-

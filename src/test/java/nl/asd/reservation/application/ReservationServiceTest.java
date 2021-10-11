@@ -109,7 +109,7 @@ class ReservationServiceTest {
         reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation);
 
-        this.service.transferWorkplace(reservation.getId(), new WorkplaceId(2));
+        this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(2));
 
         assertEquals(new WorkplaceId(2), this.repository.ofId(reservation.getId()).getWorkplace());
     }
@@ -120,7 +120,7 @@ class ReservationServiceTest {
         reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation);
 
-        assertThrows(RuntimeException.class, () -> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(1)));
+        assertThrows(RuntimeException.class, () -> this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(1)));
     }
 
     @Test
@@ -133,6 +133,6 @@ class ReservationServiceTest {
         reservation2.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation2);
 
-        assertThrows(RuntimeException.class, () -> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(2)));
+        assertThrows(RuntimeException.class, () -> this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(2)));
     }
 }

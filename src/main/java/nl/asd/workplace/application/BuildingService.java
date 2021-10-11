@@ -20,6 +20,6 @@ public class BuildingService {
     }
 
     public boolean doesWorkplaceExist(WorkplaceId workplaceId) {
-        return repository.findByWorkplace(workplaceId) != null;
+        return this.repository.findByWorkplace(workplaceId) != null;
     }
 }

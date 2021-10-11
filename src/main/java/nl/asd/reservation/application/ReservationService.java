@@ -48,14 +48,14 @@ public class ReservationService {
         this.repository.delete(reservation);
     }
 
-    public ReservationId transferWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
+    public ReservationId migrateReservationToNewWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
         var reservation = this.repository.ofId(id);
 
         if (!this.buildingService.doesWorkplaceExist(newWorkplaceId)) {
             throw new WorkplaceNotFoundException("Workplace must exist");
         }
 
-        reservation.transferWorkplace(newWorkplaceId, repository);
+        reservation.migrateTo(newWorkplaceId, repository);
 
         return reservation.getId();
     }

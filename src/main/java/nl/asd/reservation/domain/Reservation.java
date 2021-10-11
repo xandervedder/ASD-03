@@ -127,17 +127,20 @@ public class Reservation {
     }
 
     // Change the workplace of this reservation.
-    public void transferWorkplace(WorkplaceId newWorkplaceId, ReservationRepository repository) {
+    public void migrateTo(WorkplaceId newWorkplaceId, ReservationRepository repository) {
+        if (newWorkplaceId == null) {
+            throw new RuntimeException("New Workplace Id cannot be null");
+        }
         // First we check if the current workplace is equal to the new workplace
         if (this.workplace.equals(newWorkplaceId)) {
-            // if so, we don't need to change.
+            // If so, we don't need to change
             throw new RuntimeException("This reservation already uses this workplace");
         }
 
         // Secondly we need to check if the current reservation conflicts with reserved timeslots on the new workplace.
         for (var reservation : repository.findByWorkplaceAndDate(newWorkplaceId, this.reservationDate)) {
             if (this.conflictsWith(reservation)) {
-                throw new RuntimeException("This reservation can't occupy a used timeslot");
+                throw new RuntimeException("This reservation cannot occupy a used timeslot");
             }
         }
 
