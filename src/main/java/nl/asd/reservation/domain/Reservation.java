@@ -135,7 +135,7 @@ public class Reservation {
         }
 
         // Secondly we need to check if the current reservation conflicts with reserved timeslots on the new workplace.
-        for (var reservation : repository.findByWorkplace(newWorkplaceId)) {
+        for (var reservation : repository.findByWorkplaceAndDate(newWorkplaceId, this.reservationDate)) {
             if(this.conflictsWith(reservation)) {
                 throw new RuntimeException("This reservation can't occupy a used timeslot");
             }

@@ -85,7 +85,7 @@ class ReservationTest {
     public void shouldThrowWhenWorkPlaceIsInUseOnSelectedTimeslot() {
         var reservation = repository.ofId(new ReservationId(1));
         var secondReservation = repository.ofId(new ReservationId(2));
-        secondReservation.reserveTimeslot(new Timeslot(LocalDateTime.now(), LocalDateTime.now().plusMinutes(30)), this.repository);
+        secondReservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
 
         assertThrows(RuntimeException.class, ()-> reservation.changeWorkplace(secondReservation.getWorkplace(), this.repository));
     }
