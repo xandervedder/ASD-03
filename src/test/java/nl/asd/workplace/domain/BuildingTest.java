@@ -14,9 +14,10 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BuildingTest {
+    private BuildingRepository buildingRepository;
+    private HashMap<DayOfWeek, OpeningTime> standardOpeningHours;
+    private Building building;
 
-    BuildingRepository buildingRepository;
-    HashMap<DayOfWeek, OpeningTime> standardOpeningHours;
     @BeforeEach
     void initialize() {
         this.buildingRepository = new FakeBuildingRepository();
@@ -29,50 +30,46 @@ class BuildingTest {
         this.standardOpeningHours.put(DayOfWeek.FRIDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
+
+        this.building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
+        this.buildingRepository.save(this.building);
     }
 
     @Test
     void shouldCreateBuildingCorrectly() {
-        var building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        this.buildingRepository.save(building);
+        var numBuildings = this.buildingRepository.findAll().size();
 
-        assertEquals(1, this.buildingRepository.findAll().size());
+        this.buildingRepository.save(new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours));
+
+        assertEquals(numBuildings + 1, this.buildingRepository.findAll().size());
     }
 
     @Test
     void shouldThrowIfWorkplaceAlreadyExists() {
-        var building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
+        this.building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
 
-        assertThrows(RuntimeException.class, () -> building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1)));
+        assertThrows(RuntimeException.class, () -> this.building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1)));
     }
 
     @Test
     void shouldReturnFalseIfWorkplaceIsNotInBuilding() {
-        var building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        this.buildingRepository.save(building);
-
-        assertFalse(building.includesWorkplace(new WorkplaceId(1L)));
+        assertFalse(this.building.includesWorkplace(new WorkplaceId(1L)));
     }
 
     @Test
     void shouldReturnTrueIfWorkplaceIsInBuilding() {
-        var building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
-        this.buildingRepository.save(building);
+        this.building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
 
-        assertTrue(building.includesWorkplace(new WorkplaceId(1L)));
+        assertTrue(this.building.includesWorkplace(new WorkplaceId(1L)));
     }
 
     @Test
     void shouldReturnTrueIfTimeIsOutsideOfOpeningHours() {
-        var building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        assertTrue(building.isTimeOutsideOfOpeningHoursForGivenDay(LocalTime.of(0, 0), LocalTime.of(1, 0), DayOfWeek.MONDAY));
+        assertTrue(this.building.isTimeOutsideOfOpeningHoursForGivenDay(LocalTime.of(0, 0), LocalTime.of(1, 0), DayOfWeek.MONDAY));
     }
 
     @Test
     void shouldReturnFalseIfTimeIsInsideOpeningHours() {
-        var building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        assertFalse(building.isTimeOutsideOfOpeningHoursForGivenDay(LocalTime.of(9, 0), LocalTime.of(10, 0), DayOfWeek.MONDAY));
+        assertFalse(this.building.isTimeOutsideOfOpeningHoursForGivenDay(LocalTime.of(9, 0), LocalTime.of(10, 0), DayOfWeek.MONDAY));
     }
 }

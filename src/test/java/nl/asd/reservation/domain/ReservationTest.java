@@ -17,6 +17,7 @@ class ReservationTest {
 
     /**
      * Helper method that reduces code bloat and increases readability
+     *
      * @return Time normalized to zero minutes
      */
     private LocalTime time() {
@@ -87,14 +88,14 @@ class ReservationTest {
         var secondReservation = repository.ofId(new ReservationId(2));
         secondReservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
 
-        assertThrows(RuntimeException.class, ()-> reservation.transferWorkplace(secondReservation.getWorkplace(), this.repository));
+        assertThrows(RuntimeException.class, () -> reservation.transferWorkplace(secondReservation.getWorkplace(), this.repository));
     }
 
     @Test
     public void shouldThrowWhenNewWorkplaceIsEqualToCurrentWorkplace() {
         var reservation = repository.ofId(new ReservationId(1));
 
-        assertThrows(RuntimeException.class, ()-> reservation.transferWorkplace(new WorkplaceId(1), this.repository));
+        assertThrows(RuntimeException.class, () -> reservation.transferWorkplace(new WorkplaceId(1), this.repository));
     }
 
     @Test

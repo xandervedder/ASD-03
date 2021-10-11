@@ -118,8 +118,8 @@ public class Reservation {
 
     // Checks if this reservation has any overlapping timeslots reserved on the to be compared to reservation.
     public boolean conflictsWith(Reservation other) {
-        for(var slot : this.slots) {
-            if(slot.conflictsWith(other.slots)) {
+        for (var slot : this.slots) {
+            if (slot.conflictsWith(other.slots)) {
                 return true;
             }
         }
@@ -129,14 +129,14 @@ public class Reservation {
     // Change the workplace of this reservation.
     public void transferWorkplace(WorkplaceId newWorkplaceId, ReservationRepository repository) {
         // First we check if the current workplace is equal to the new workplace
-        if(this.workplace.equals(newWorkplaceId)) {
+        if (this.workplace.equals(newWorkplaceId)) {
             // if so, we don't need to change.
             throw new RuntimeException("This reservation already uses this workplace");
         }
 
         // Secondly we need to check if the current reservation conflicts with reserved timeslots on the new workplace.
         for (var reservation : repository.findByWorkplaceAndDate(newWorkplaceId, this.reservationDate)) {
-            if(this.conflictsWith(reservation)) {
+            if (this.conflictsWith(reservation)) {
                 throw new RuntimeException("This reservation can't occupy a used timeslot");
             }
         }

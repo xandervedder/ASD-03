@@ -32,6 +32,7 @@ class ReservationServiceTest {
 
     /**
      * Helper method that reduces code bloat and increases readability
+     *
      * @return Time normalized to zero minutes
      */
     private LocalTime time() {
@@ -119,7 +120,7 @@ class ReservationServiceTest {
         reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation);
 
-        assertThrows(RuntimeException.class, ()-> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(1)));
+        assertThrows(RuntimeException.class, () -> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(1)));
     }
 
     @Test
@@ -132,6 +133,6 @@ class ReservationServiceTest {
         reservation2.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation2);
 
-        assertThrows(RuntimeException.class, ()-> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(2)));
+        assertThrows(RuntimeException.class, () -> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(2)));
     }
 }

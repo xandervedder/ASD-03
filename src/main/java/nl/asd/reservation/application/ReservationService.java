@@ -1,10 +1,10 @@
 package nl.asd.reservation.application;
 
+import nl.asd.reservation.domain.*;
 import nl.asd.shared.exception.CancellationNotAllowedException;
 import nl.asd.shared.exception.ReservationNotFoundException;
-import nl.asd.reservation.domain.*;
-import nl.asd.shared.id.WorkplaceId;
 import nl.asd.shared.exception.WorkplaceNotFoundException;
+import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
@@ -51,7 +51,7 @@ public class ReservationService {
     public ReservationId transferWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
         var reservation = this.repository.ofId(id);
 
-        if(!this.buildingService.doesWorkplaceExist(newWorkplaceId)) {
+        if (!this.buildingService.doesWorkplaceExist(newWorkplaceId)) {
             throw new WorkplaceNotFoundException("Workplace must exist");
         }
 
