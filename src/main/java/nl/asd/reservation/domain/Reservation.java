@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Reservation {
     private final LocalDate createdAt;
-    private final List<Timeslot> slots;
 
+    private List<Timeslot> slots;
     private ReservationId id;
     private LocalDate reservationDate;
     private ReservationType type;
@@ -18,8 +18,8 @@ public class Reservation {
 
     public Reservation(ReservationId id, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
         this.createdAt = LocalDate.now();
-        this.slots = new ArrayList<>();
 
+        this.slots = new ArrayList<>();
         this.setId(id);
         this.setReservationDate(reservationDate);
         this.setType(type);
@@ -91,8 +91,9 @@ public class Reservation {
     }
 
     public void changeTimeslot(List<Timeslot> newSlots, ReservationRepository repository) {
-        reserveTimeslots(newSlots, repository);
-        this.slots = newSlots;
+        var copy = new ArrayList<>(newSlots);
+        reserveTimeslots(copy, repository);
+        this.slots = copy;
     }
 
     public void reserveTimeslot(Timeslot timeslot, ReservationRepository repository) {
