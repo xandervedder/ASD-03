@@ -1,7 +1,7 @@
 package nl.asd.reservation.application;
 
-import nl.asd.reservation.CancellationNotAllowedException;
-import nl.asd.reservation.ReservationNotFoundException;
+import nl.asd.shared.exception.CancellationNotAllowedException;
+import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;

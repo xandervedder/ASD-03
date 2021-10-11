@@ -1,10 +1,10 @@
 package nl.asd.reservation.application;
 
-import nl.asd.reservation.CancellationNotAllowedException;
-import nl.asd.reservation.ReservationNotFoundException;
+import nl.asd.shared.exception.CancellationNotAllowedException;
+import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.shared.id.WorkplaceId;
-import nl.asd.workplace.WorkplaceNotFoundException;
+import nl.asd.shared.exception.WorkplaceNotFoundException;
 import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
