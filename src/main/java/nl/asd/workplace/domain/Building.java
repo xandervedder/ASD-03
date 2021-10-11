@@ -53,6 +53,10 @@ public class Building {
 
     public void registerWorkplace(Workplace workplace) {
         // TODO: business rules
+        if(this.workplaces.contains(workplace)) {
+            throw new RuntimeException("This building already contains this workplace");
+        }
+
         this.workplaces.add(workplace);
     }
 
