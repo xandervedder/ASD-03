@@ -93,12 +93,4 @@ public record Timeslot(LocalTime from, LocalTime to) {
     public int hashCode() {
         return Objects.hash(from, to);
     }
-
-    @Override
-    public String toString() {
-        return "Timeslot{" +
-                "from=" + from +
-                ", to=" + to +
-                '}';
-    }
 }

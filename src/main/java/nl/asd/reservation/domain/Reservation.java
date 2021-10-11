@@ -3,8 +3,8 @@ package nl.asd.reservation.domain;
 import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Reservation {
@@ -32,7 +32,7 @@ public class Reservation {
 
     public void setId(ReservationId id) {
         if (id == null) {
-            throw new IllegalArgumentException("Cannot create reservation without an id");
+            throw new IllegalArgumentException("Reservation id cannot be null");
         }
 
         this.id = id;
@@ -48,11 +48,11 @@ public class Reservation {
 
     public void setReservationDate(LocalDate reservationDate) {
         if (reservationDate == null) {
-            throw new IllegalArgumentException("Cannot create a reservation without a reservation date");
+            throw new IllegalArgumentException("Reservation date cannot be null");
         }
 
         if (reservationDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Cannot create a reservation that is in the past");
+            throw new IllegalArgumentException("Reseration date cannot be in the past");
         }
 
         this.reservationDate = reservationDate;
@@ -64,14 +64,14 @@ public class Reservation {
 
     public void setType(ReservationType type) {
         if (type == null) {
-            throw new IllegalArgumentException("Cannot create a reservation without a reservation type");
+            throw new IllegalArgumentException("Reservation type cannot be null");
         }
 
         this.type = type;
     }
 
     public List<Timeslot> getSlots() {
-        return slots;
+        return Collections.unmodifiableList(this.slots);
     }
 
     public WorkplaceId getWorkplace() {
