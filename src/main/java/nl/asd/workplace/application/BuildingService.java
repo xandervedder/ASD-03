@@ -1,5 +1,6 @@
 package nl.asd.workplace.application;
 
+import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.domain.BuildingRepository;
 
@@ -16,5 +17,9 @@ public class BuildingService {
     public boolean isTimeOutsideOfOpeningHoursForGivenDay(WorkplaceId id, LocalDate date, LocalTime from, LocalTime to) {
         var building = repository.findByWorkplace(id);
         return building.isTimeOutsideOfOpeningHoursForGivenDay(from, to, date.getDayOfWeek());
+    }
+
+    public boolean doesWorkplaceExist(WorkplaceId workplaceId) {
+        return this.repository.findByWorkplace(workplaceId) != null;
     }
 }

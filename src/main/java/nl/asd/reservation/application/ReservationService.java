@@ -1,13 +1,13 @@
 package nl.asd.reservation.application;
 
-import nl.asd.reservation.CancellationNotAllowedException;
-import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
+import nl.asd.shared.exception.CancellationNotAllowedException;
+import nl.asd.shared.exception.ReservationNotFoundException;
+import nl.asd.shared.exception.WorkplaceNotFoundException;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public class ReservationService {
@@ -46,5 +46,17 @@ public class ReservationService {
             throw new CancellationNotAllowedException("Reservation cannot be cancelled on the same day");
 
         this.repository.delete(reservation);
+    }
+
+    public ReservationId migrateReservationToNewWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
+        var reservation = this.repository.ofId(id);
+
+        if (!this.buildingService.doesWorkplaceExist(newWorkplaceId)) {
+            throw new WorkplaceNotFoundException("Workplace must exist");
+        }
+
+        reservation.migrateTo(newWorkplaceId, repository);
+
+        return reservation.getId();
     }
 }

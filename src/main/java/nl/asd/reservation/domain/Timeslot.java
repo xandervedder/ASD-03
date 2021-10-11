@@ -22,6 +22,11 @@ public record Timeslot(LocalTime from, LocalTime to) {
         return ChronoUnit.MINUTES.between(this.from, this.to);
     }
 
+    // Checks if this slot conflicts with a number of different timeslots
+    public boolean conflictsWith(List<Timeslot> others) {
+        return others.stream().anyMatch(this::conflictsWith);
+    }
+
     public boolean conflictsWith(Timeslot other) {
         return
                 // begindatum huidige voor andere einddatum
@@ -49,7 +54,7 @@ public record Timeslot(LocalTime from, LocalTime to) {
         var hourDifference = to.getHour() - fromHour;
         // Edge cases that handles times like 11:30 - 12:00, we only want
         // to use the minutes in this case so we set the hourDifference to zero
-        if (from.getMinute() == 30 && hourDifference == 1 ) {
+        if (from.getMinute() == 30 && hourDifference == 1) {
             hourDifference = 0;
         }
 

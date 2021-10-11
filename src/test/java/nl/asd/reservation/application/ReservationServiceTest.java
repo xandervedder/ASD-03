@@ -1,10 +1,8 @@
 package nl.asd.reservation.application;
 
-import nl.asd.reservation.CancellationNotAllowedException;
-import nl.asd.reservation.ReservationNotFoundException;
-import nl.asd.reservation.domain.ReservationId;
-import nl.asd.reservation.domain.ReservationRepository;
-import nl.asd.reservation.domain.Timeslot;
+import nl.asd.shared.exception.CancellationNotAllowedException;
+import nl.asd.shared.exception.ReservationNotFoundException;
+import nl.asd.reservation.domain.*;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
@@ -32,6 +30,15 @@ class ReservationServiceTest {
     private LocalTime from;
     private LocalTime to;
 
+    /**
+     * Helper method that reduces code bloat and increases readability
+     *
+     * @return Time normalized to zero minutes
+     */
+    private LocalTime time() {
+        return LocalTime.now().withMinute(0);
+    }
+
     @BeforeEach
     public void initialize() {
         var buildingRepository = new FakeBuildingRepository();
@@ -46,6 +53,7 @@ class ReservationServiceTest {
 
         var building = new Building(buildingRepository.nextId(), "Test Building", openingHours);
         building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
+        building.registerWorkplace(new Workplace(new WorkplaceId(2L), 2, 1));
         buildingRepository.save(building);
 
         this.workplace = new WorkplaceId(1L);
@@ -93,5 +101,38 @@ class ReservationServiceTest {
         var to = LocalTime.of(20, 0);
 
         assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, LocalDate.now(), List.of(new Timeslot(from, to))));
+    }
+
+    @Test
+    public void shouldChangeWorkplaceCorrectly() {
+        var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(1L));
+        reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
+        this.repository.save(reservation);
+
+        this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(2));
+
+        assertEquals(new WorkplaceId(2), this.repository.ofId(reservation.getId()).getWorkplace());
+    }
+
+    @Test
+    public void shouldThrowWhenNewWorkplaceIdIsEqualToCurrentWorkspaceId() {
+        var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(1L));
+        reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
+        this.repository.save(reservation);
+
+        assertThrows(RuntimeException.class, () -> this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(1)));
+    }
+
+    @Test
+    public void shouldThrowWhenNewWorkplaceHasConflictingReservation() {
+        var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(1L));
+        reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
+        this.repository.save(reservation);
+
+        var reservation2 = new Reservation(new ReservationId(2L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(2L));
+        reservation2.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
+        this.repository.save(reservation2);
+
+        assertThrows(RuntimeException.class, () -> this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(2)));
     }
 }
