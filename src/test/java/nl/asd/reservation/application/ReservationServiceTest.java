@@ -112,9 +112,9 @@ class ReservationServiceTest {
     public void shouldChangeTimeslotsCorrectly() {
         var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, List.of(new Timeslot(this.from, this.to)));
 
-        var newTimeslot1 = new Timeslot(LocalTime.now(), LocalTime.now().plusMinutes(120));
-        var newTimeslot2 = new Timeslot(LocalTime.now().plusMinutes(120), LocalTime.now().plusMinutes(150));
-        var newTimeslot3 = new Timeslot(LocalTime.now().plusMinutes(150), LocalTime.now().plusMinutes(180));
+        var newTimeslot1 = new Timeslot(this.from.plusMinutes(90), this.to.plusMinutes(90));
+        var newTimeslot2 = new Timeslot(this.from.plusMinutes(120), this.to.plusMinutes(120));
+        var newTimeslot3 = new Timeslot(this.from.plusMinutes(150), this.to.plusMinutes(150));
 
         this.service.changeTimeslotForExistingReservation(id, List.of(newTimeslot1, newTimeslot2, newTimeslot3));
         assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), repository.ofId(id).getSlots());
