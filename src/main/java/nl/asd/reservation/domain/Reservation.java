@@ -4,26 +4,26 @@ import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Reservation {
+    private final LocalDate createdAt;
+    private final List<Timeslot> slots;
+
     private ReservationId id;
-    private LocalDate createdAt;
     private LocalDate reservationDate;
     private ReservationType type;
-    private List<Timeslot> slots;
-
     private WorkplaceId workplace;
 
-    public Reservation(ReservationId id, LocalDate createdAt, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
-        // w.i.p. validatie
-        this.id = id;
-        this.createdAt = createdAt;
-        this.reservationDate = reservationDate;
-        this.type = type;
+    public Reservation(ReservationId id, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
+        this.createdAt = LocalDate.now();
         this.slots = new ArrayList<>();
 
-        this.workplace = workplace;
+        this.setId(id);
+        this.setReservationDate(reservationDate);
+        this.setType(type);
+        this.setWorkplace(workplace);
     }
 
     public ReservationId getId() {
@@ -31,6 +31,10 @@ public class Reservation {
     }
 
     public void setId(ReservationId id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Reservation id cannot be null");
+        }
+
         this.id = id;
     }
 
@@ -38,28 +42,36 @@ public class Reservation {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
+    public LocalDate getReservationDate() {
+        return reservationDate;
     }
 
-    public LocalDate getReservationDate() { return reservationDate; }
+    public void setReservationDate(LocalDate reservationDate) {
+        if (reservationDate == null) {
+            throw new IllegalArgumentException("Reservation date cannot be null");
+        }
 
-    public void setReservationDate(LocalDate reservationDate) { this.reservationDate = reservationDate; }
+        if (reservationDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Reseration date cannot be in the past");
+        }
+
+        this.reservationDate = reservationDate;
+    }
 
     public ReservationType getType() {
         return type;
     }
 
     public void setType(ReservationType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Reservation type cannot be null");
+        }
+
         this.type = type;
     }
 
     public List<Timeslot> getSlots() {
-        return slots;
-    }
-
-    public void setSlots(List<Timeslot> slots) {
-        this.slots = slots;
+        return Collections.unmodifiableList(this.slots);
     }
 
     public WorkplaceId getWorkplace() {
@@ -67,6 +79,10 @@ public class Reservation {
     }
 
     public void setWorkplace(WorkplaceId workplace) {
+        if (workplace == null) {
+            throw new IllegalArgumentException("Cannot create a reservation without an associated workplace");
+        }
+
         this.workplace = workplace;
     }
 
@@ -75,21 +91,18 @@ public class Reservation {
     }
 
     public void reserveTimeslot(Timeslot timeslot, ReservationRepository repository) {
-        // Validatie hier, we willen immers kijken of er een timeslot hierin zit die hetzelfde is
+        // Check if we have the same slot already added to this reservation
         for (var slot : this.slots) {
-            if (slot.equals(timeslot)) {
-                // Custom exception is hier ook beter...
+            if (slot.conflictsWith(timeslot)) {
+                // Custom exception would be better here..
                 throw new RuntimeException("This timeslot has already been added");
             }
         }
 
-        // Tevens willen we ook zien of een andere reservation op
-        // dezelfde workplace al een reservatie heeft zitten...
-        var reservations = repository.findByWorkplace(this.workplace);
+        var reservations = repository.findByWorkplaceAndDate(this.workplace, this.reservationDate);
         for (var reservation : reservations) {
-            // Bepaal of de gewenste timeslot in de andere timeslots zit (conflicteert met)
-            var timeslots = reservation.slots;
-            if (timeslots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
+            // Check if other timeslots conflict with the given one
+            if (reservation.slots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
                 throw new RuntimeException("This has already been reserved");
             }
         }
@@ -97,9 +110,9 @@ public class Reservation {
         this.slots.add(timeslot);
     }
 
-    public void reserveTimeslots(List<Timeslot> slots, ReservationRepository repository) {
-        for (var slot : slots) {
-            this.reserveTimeslot(slot, repository);
+    public void reserveTimeslots(List<Timeslot> timeslots, ReservationRepository repository) {
+        for (var timeslot : timeslots) {
+            this.reserveTimeslot(timeslot, repository);
         }
     }
 
