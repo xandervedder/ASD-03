@@ -27,12 +27,16 @@ public class BuildingService {
     }
 
     public Building createBuilding(String name) {
-        return new Building(repository.nextId(), name);
+        Building building = new Building(repository.nextId(), name);
+        // In reality this would be bad, but this would be solved by using Spring which returns the instance on save
+        repository.save(building);
+        return repository.ofId(building.getId());
     }
 
     public Building addWorkplacesToBuilding(BuildingId id, List<Workplace> workplaces) {
         var building = repository.ofId(id);
         building.addWorkplaces(workplaces);
-        return building;
+        repository.save(building);
+        return repository.ofId(building.getId());
     }
 }
