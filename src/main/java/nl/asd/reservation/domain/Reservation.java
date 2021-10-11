@@ -52,7 +52,7 @@ public class Reservation {
         }
 
         if (reservationDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Reseration date cannot be in the past");
+            throw new IllegalArgumentException("Reservation date cannot be in the past");
         }
 
         this.reservationDate = reservationDate;
