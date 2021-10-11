@@ -1,6 +1,5 @@
 package nl.asd.workplace.port.adapter;
 
-import nl.asd.reservation.domain.ReservationId;
 import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.domain.Building;
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class FakeBuildingRepository implements BuildingRepository {
     private final HashMap<BuildingId, Building> store = new HashMap<>();
-    private long internalIncrementor = 0L;
+    private long internalIncrementer = 0L;
 
     @Override
     public Building ofId(BuildingId id) {
@@ -29,8 +28,8 @@ public class FakeBuildingRepository implements BuildingRepository {
 
     @Override
     public BuildingId nextId() {
-        this.internalIncrementor++;
-        return new BuildingId(this.internalIncrementor);
+        this.internalIncrementer++;
+        return new BuildingId(this.internalIncrementer);
     }
 
     @Override
