@@ -90,11 +90,10 @@ public class Reservation {
         return slots.stream().map(Timeslot::minutes).reduce(0L, Long::sum);
     }
 
-    public void reserveTimeslot(LocalTime from, LocalTime to, ReservationRepository repository) {
-        var timeslots = Timeslot.ofTimeRange(from, to);
+    public void reserveTimeslot(Timeslot timeslot, ReservationRepository repository) {
         // Check if we have the same slot already added to this reservation
-        for (var slot : timeslots) {
-            if (this.slots.stream().anyMatch(s -> s.equals(slot))) {
+        for (var slot : this.slots) {
+            if (slot.conflictsWith(timeslot)) {
                 // Custom exception would be better here..
                 throw new RuntimeException("This timeslot has already been added");
             }
@@ -102,25 +101,18 @@ public class Reservation {
 
         var reservations = repository.findByWorkplaceAndDate(this.workplace, this.reservationDate);
         for (var reservation : reservations) {
-            for (var slot : reservation.slots) {
-                // Check if other timeslots conflict with the given one
-                if (timeslots.stream().anyMatch(t -> t.conflictsWith(slot))) {
-                    throw new RuntimeException("This has already been reserved");
-                }
+            // Check if other timeslots conflict with the given one
+            if (reservation.slots.stream().anyMatch(t -> t.conflictsWith(timeslot))) {
+                throw new RuntimeException("This has already been reserved");
             }
         }
 
-        this.slots.addAll(timeslots);
+        this.slots.add(timeslot);
     }
 
-    public void reserveTimeslots(List<LocalTime> fromList, List<LocalTime> toList, ReservationRepository repository) {
-        // This should eventually be done with some type of object...
-        if (fromList.size() != toList.size()) {
-            throw new IllegalArgumentException("Time range lists should be of same size");
-        }
-
-        for (int i = 0; i < fromList.size(); i++) {
-            this.reserveTimeslot(fromList.get(i), toList.get(i), repository);
+    public void reserveTimeslots(List<Timeslot> timeslots, ReservationRepository repository) {
+        for (var timeslot : timeslots) {
+            this.reserveTimeslot(timeslot, repository);
         }
     }
 

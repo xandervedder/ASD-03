@@ -19,26 +19,22 @@ public class ReservationService {
         this.buildingService = buildingService;
     }
 
-    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate reservationDate, List<LocalTime> from, List<LocalTime> to) {
+    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate reservationDate, List<Timeslot> timeslots) {
         // Check for each time range if it is outside the openings hours
-        for (int i = 0; i < from.size(); i++) {
+        for (var slot : timeslots) {
             // Throw here or at buildingService...?
-            if (this.buildingService.isTimeOutsideOfOpeningHoursForGivenDay(workplace, reservationDate, from.get(i), to.get(i))) {
+            if (this.buildingService.isTimeOutsideOfOpeningHoursForGivenDay(workplace, reservationDate, slot.from(), slot.to())) {
                 throw new RuntimeException("Given time is not within opening hours range");
             }
         }
 
         var id = this.repository.nextId();
         var reservation = new Reservation(id, reservationDate, ReservationType.ONCE, workplace);
-        reservation.reserveTimeslots(from, to, this.repository);
+        reservation.reserveTimeslots(timeslots, this.repository);
         this.repository.save(reservation);
 
         // Mag dit?
         return reservation.getId();
-    }
-
-    public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate reservationDate, LocalTime from, LocalTime to) {
-        return this.reserveWorkplace(workplace, reservationDate, List.of(from), List.of(to));
     }
 
     public void cancelReservation(ReservationId reservationId) {

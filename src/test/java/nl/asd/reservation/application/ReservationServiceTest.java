@@ -4,6 +4,7 @@ import nl.asd.reservation.CancellationNotAllowedException;
 import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.ReservationId;
 import nl.asd.reservation.domain.ReservationRepository;
+import nl.asd.reservation.domain.Timeslot;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
@@ -18,6 +19,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,19 +59,19 @@ class ReservationServiceTest {
 
     @Test
     public void shouldCreateReservationCorrectly() {
-        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to));
+        assertDoesNotThrow(() -> this.service.reserveWorkplace(this.workplace, this.reservationDate, List.of(new Timeslot(this.from, this.to))));
     }
 
     @Test
     public void shouldCancelReservationCorrectly() {
-        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, List.of(new Timeslot(this.from, this.to)));
         this.service.cancelReservation(id);
         assertEquals(0, this.repository.findAll().size());
     }
 
     @Test
     public void cancelReservationShouldNotThrowException() {
-        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, List.of(new Timeslot(this.from, this.to)));
         assertDoesNotThrow(() -> this.service.cancelReservation(id));
     }
 
@@ -80,7 +82,7 @@ class ReservationServiceTest {
 
     @Test
     public void cancelReservationTooLateShouldThrowException() {
-        var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), this.from, this.to);
+        var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), List.of(new Timeslot(this.from, this.to)));
         assertThrows(CancellationNotAllowedException.class, () -> this.service.cancelReservation(id));
     }
 
@@ -90,6 +92,6 @@ class ReservationServiceTest {
         var from = LocalTime.of(19, 30);
         var to = LocalTime.of(20, 0);
 
-        assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, LocalDate.now(), from, to));
+        assertThrows(RuntimeException.class, () -> this.service.reserveWorkplace(workplace, LocalDate.now(), List.of(new Timeslot(from, to))));
     }
 }

@@ -26,7 +26,7 @@ class ReservationTest {
     @BeforeEach
     public void initialize() {
         var targetReservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1L));
-        targetReservation.reserveTimeslot(time().withMinute(0), time().withMinute(30), this.repository);
+        targetReservation.reserveTimeslot(new Timeslot(time().withMinute(0), time().withMinute(30)), this.repository);
         this.repository.save(targetReservation);
         this.repository.save(new Reservation(new ReservationId(2L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(2L)));
         this.repository.save(new Reservation(new ReservationId(3L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(3L)));
@@ -78,7 +78,7 @@ class ReservationTest {
     @Test
     public void shouldShowTotalReservationTimeCorrectlyWithOneTimeslot() {
         var reservation = new Reservation(new ReservationId(0L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
-        reservation.reserveTimeslot(time(), time().plusMinutes(30), this.repository);
+        reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
 
         assertEquals(30, reservation.totalMinutesReserved());
     }
@@ -86,15 +86,12 @@ class ReservationTest {
     @Test
     public void shouldShowTotalReservationTimeCorrectlyWithMultipleTimeslots() {
         var reservation = new Reservation(new ReservationId(0L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
-        // We need some type of object for this
-        var from1 = time();
-        var to1 = time().plusMinutes(30);
-        var from2 = time().plusMinutes(30);
-        var to2 = time().plusMinutes(60);
-        var from3 = time().plusMinutes(60);
-        var to3 = time().plusMinutes(90);
+        // We need some type of object for this we have one :)
+        var t1 = new Timeslot(time(), time().plusMinutes(30));
+        var t2 = new Timeslot(time().plusMinutes(30), time().plusMinutes(60));
+        var t3 = new Timeslot(time().plusMinutes(60), time().plusMinutes(90));
 
-        reservation.reserveTimeslots(List.of(from1, from2, from3), List.of(to1, to2, to3), this.repository);
+        reservation.reserveTimeslots(List.of(t1, t2, t3), this.repository);
 
         assertEquals(90, reservation.totalMinutesReserved());
     }
@@ -105,9 +102,9 @@ class ReservationTest {
         var from = time();
         var to = time().plusMinutes(30);
 
-        reservation.reserveTimeslot(from, to, this.repository);
+        reservation.reserveTimeslot(new Timeslot(from, to), this.repository);
 
-        assertThrows(RuntimeException.class, () -> reservation.reserveTimeslot(from, to, this.repository));
+        assertThrows(RuntimeException.class, () -> reservation.reserveTimeslot(new Timeslot(from, to), this.repository));
     }
 
     @Test
@@ -115,13 +112,13 @@ class ReservationTest {
         // workplaceid 1 is al in gebruik
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));
 
-        assertThrows(RuntimeException.class, () -> reservation.reserveTimeslot(time(), time().plusMinutes(30), this.repository));
+        assertThrows(RuntimeException.class, () -> reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository));
     }
 
     @Test
     public void shouldNotThrowWhenReservingATimeslotThatHasTheSameTimeOnAnotherDay() {
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(2), ReservationType.ONCE, new WorkplaceId(1));
-        assertDoesNotThrow(() -> reservation.reserveTimeslot(time(), time().plusMinutes(30), this.repository));
+        assertDoesNotThrow(() -> reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository));
     }
 
     @Test
@@ -129,7 +126,7 @@ class ReservationTest {
         // workplaceid 1 is al in gebruik, timeslot niet
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));
 
-        assertDoesNotThrow(() -> reservation.reserveTimeslot(time().plusMinutes(60), time().plusMinutes(90), this.repository));
+        assertDoesNotThrow(() -> reservation.reserveTimeslot(new Timeslot(time().plusMinutes(60), time().plusMinutes(90)), this.repository));
     }
 
     @Test
@@ -137,6 +134,6 @@ class ReservationTest {
         // workplaceid 1 is al in gebruik, timeslot niet
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));
 
-        assertDoesNotThrow(() -> reservation.reserveTimeslot(time().minusMinutes(90), time().minusMinutes(60), this.repository));
+        assertDoesNotThrow(() -> reservation.reserveTimeslot(new Timeslot(time().minusMinutes(90), time().minusMinutes(60)), this.repository));
     }
 }
