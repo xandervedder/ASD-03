@@ -24,7 +24,7 @@ public class FakeBuildingRepository implements BuildingRepository {
         return this.store.values().stream()
                 .filter(b -> b.includesWorkplace(id))
                 .findFirst()
-                .orElseThrow();
+                .orElse(null);
     }
 
     @Override

@@ -4,10 +4,10 @@ import nl.asd.reservation.CancellationNotAllowedException;
 import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.shared.id.WorkplaceId;
+import nl.asd.workplace.WorkplaceNotFoundException;
 import nl.asd.workplace.application.BuildingService;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public class ReservationService {
@@ -48,9 +48,14 @@ public class ReservationService {
         this.repository.delete(reservation);
     }
 
-    public ReservationId changeWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
+    public ReservationId transferWorkplace(ReservationId id, WorkplaceId newWorkplaceId) {
         var reservation = this.repository.ofId(id);
-        reservation.changeWorkplace(newWorkplaceId, repository);
+
+        if(!this.buildingService.doesWorkplaceExist(newWorkplaceId)) {
+            throw new WorkplaceNotFoundException("Workplace must exist");
+        }
+
+        reservation.transferWorkplace(newWorkplaceId, repository);
 
         return reservation.getId();
     }

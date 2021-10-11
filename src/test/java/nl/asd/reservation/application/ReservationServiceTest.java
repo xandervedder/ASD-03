@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +52,7 @@ class ReservationServiceTest {
 
         var building = new Building(buildingRepository.nextId(), "Test Building", openingHours);
         building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
+        building.registerWorkplace(new Workplace(new WorkplaceId(2L), 2, 1));
         buildingRepository.save(building);
 
         this.workplace = new WorkplaceId(1L);
@@ -108,7 +108,7 @@ class ReservationServiceTest {
         reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation);
 
-        this.service.changeWorkplace(reservation.getId(), new WorkplaceId(2));
+        this.service.transferWorkplace(reservation.getId(), new WorkplaceId(2));
 
         assertEquals(new WorkplaceId(2), this.repository.ofId(reservation.getId()).getWorkplace());
     }
@@ -119,7 +119,7 @@ class ReservationServiceTest {
         reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation);
 
-        assertThrows(RuntimeException.class, ()-> this.service.changeWorkplace(reservation.getId(), new WorkplaceId(1)));
+        assertThrows(RuntimeException.class, ()-> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(1)));
     }
 
     @Test
@@ -132,6 +132,6 @@ class ReservationServiceTest {
         reservation2.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
         this.repository.save(reservation2);
 
-        assertThrows(RuntimeException.class, ()-> this.service.changeWorkplace(reservation.getId(), new WorkplaceId(2)));
+        assertThrows(RuntimeException.class, ()-> this.service.transferWorkplace(reservation.getId(), new WorkplaceId(2)));
     }
 }

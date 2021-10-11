@@ -127,7 +127,7 @@ public class Reservation {
     }
 
     // Change the workplace of this reservation.
-    public void changeWorkplace(WorkplaceId newWorkplaceId, ReservationRepository repository) {
+    public void transferWorkplace(WorkplaceId newWorkplaceId, ReservationRepository repository) {
         // First we check if the current workplace is equal to the new workplace
         if(this.workplace.equals(newWorkplaceId)) {
             // if so, we don't need to change.
