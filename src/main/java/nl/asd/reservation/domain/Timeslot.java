@@ -24,12 +24,7 @@ public record Timeslot(LocalTime from, LocalTime to) {
 
     // Checks if this slot conflicts with a number of different timeslots
     public boolean conflictsWith(List<Timeslot> others) {
-        for(var slot : others) {
-            if(this.conflictsWith(slot)) {
-                return true;
-            }
-        }
-        return false;
+        return others.stream().anyMatch(this::conflictsWith);
     }
 
     public boolean conflictsWith(Timeslot other) {
