@@ -1,6 +1,7 @@
 package nl.asd.reservation.application;
 
 import nl.asd.reservation.CancellationNotAllowedException;
+import nl.asd.reservation.ChangeTimeslotNotAllowedException;
 import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.domain.ReservationId;
 import nl.asd.reservation.domain.ReservationRepository;
@@ -153,5 +154,25 @@ class ReservationServiceTest {
         this.repository.save(reservation2);
 
         assertThrows(RuntimeException.class, () -> this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(2)));
+    }
+
+    @Test
+    public void shouldThrowWhenChangingATimeslotOnTheDayOfTheReservation() {
+        var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), List.of(new Timeslot(this.from, this.to)));
+
+        var newTimeslot1 = new Timeslot(this.from.plusMinutes(90), this.to.plusMinutes(90));
+        var newTimeslot2 = new Timeslot(this.from.plusMinutes(120), this.to.plusMinutes(120));
+        var newTimeslot3 = new Timeslot(this.from.plusMinutes(150), this.to.plusMinutes(150));
+
+        assertThrows(ChangeTimeslotNotAllowedException.class, () -> this.service.changeTimeslotForExistingReservation(id, List.of(newTimeslot1, newTimeslot2, newTimeslot3)));
+    }
+
+    @Test
+    public void changeTimeslotOfNonExistingReservationShouldThrowException() {
+        var newTimeslot1 = new Timeslot(this.from.plusMinutes(90), this.to.plusMinutes(90));
+        var newTimeslot2 = new Timeslot(this.from.plusMinutes(120), this.to.plusMinutes(120));
+        var newTimeslot3 = new Timeslot(this.from.plusMinutes(150), this.to.plusMinutes(150));
+
+        assertThrows(ReservationNotFoundException.class, () -> this.service.changeTimeslotForExistingReservation(new ReservationId(1000L), List.of(newTimeslot1, newTimeslot2, newTimeslot3)));
     }
 }

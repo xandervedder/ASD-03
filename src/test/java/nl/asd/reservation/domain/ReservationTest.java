@@ -1,5 +1,7 @@
 package nl.asd.reservation.domain;
 
+import nl.asd.reservation.ChangeTimeslotNotAllowedException;
+import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 import org.junit.jupiter.api.AfterEach;
@@ -198,5 +200,18 @@ class ReservationTest {
         reservation.changeTimeslot(List.of(newTimeslot1, newTimeslot2, newTimeslot3), this.repository);
 
         assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), reservation.getSlots());
+    }
+
+    @Test
+    public void changingTimeslotOnTheDayOfTheReservationShouldThrowException() {
+        var time = LocalTime.now().withMinute(0);
+
+        var newTimeslot1 = new Timeslot(time.plusMinutes(90), time.plusMinutes(120));
+        var newTimeslot2 = new Timeslot(time.plusMinutes(120), time.plusMinutes(150));
+        var newTimeslot3 = new Timeslot(time.plusMinutes(150), time.plusMinutes(180));
+
+        var reservation = new Reservation(new ReservationId(0L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(5));
+
+        assertThrows(ChangeTimeslotNotAllowedException.class, () -> reservation.changeTimeslot(List.of(newTimeslot1, newTimeslot2, newTimeslot3), repository));
     }
 }
