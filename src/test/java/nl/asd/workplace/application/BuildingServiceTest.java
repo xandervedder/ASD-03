@@ -5,11 +5,9 @@ import nl.asd.reservation.domain.ReservationRepository;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
-import nl.asd.workplace.domain.Building;
-import nl.asd.workplace.domain.BuildingRepository;
-import nl.asd.workplace.domain.OpeningTime;
-import nl.asd.workplace.domain.Workplace;
+import nl.asd.workplace.domain.*;
 import nl.asd.workplace.port.adapter.FakeBuildingRepository;
+import nl.asd.workplace.port.adapter.FakeWorkplaceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +17,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BuildingServiceTest {
     private BuildingRepository buildingRepository;
@@ -28,6 +25,7 @@ class BuildingServiceTest {
     private BuildingService buildingService;
     private ReservationService reservationService;
     private ReservationRepository reservationRepository;
+    private WorkplaceRepository workplaceRepository = new FakeWorkplaceRepository();
 
     private WorkplaceId workplaceId;
     private LocalDate reservationDate;
@@ -51,9 +49,9 @@ class BuildingServiceTest {
         this.to = LocalTime.of(13, 0);
 
         this.reservationRepository = new FakeReservationRepository();
-        this.reservationService = new ReservationService(this.reservationRepository, new BuildingService(buildingRepository));
+        this.reservationService = new ReservationService(this.reservationRepository, new BuildingService(buildingRepository, workplaceRepository));
         this.buildingRepository = new FakeBuildingRepository();
-        this.buildingService = new BuildingService(this.buildingRepository);
+        this.buildingService = new BuildingService(this.buildingRepository, workplaceRepository);
         this.workplace = new Workplace(workplaceId1, 0, 0);
 
         openingHours = new HashMap<>();
@@ -66,6 +64,18 @@ class BuildingServiceTest {
         openingHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
     }
 
+    @Test
+    public void doesWorkplaceExistShouldReturnFalseIfWorkpalceDoesNotExist() {
+        assertFalse(buildingService.doesWorkplaceExist(workplaceId));
+    }
+
+    @Test
+    public void doesWorkplaceExistShouldReturnTrueIfWorkpalceDoesExist() {
+        Building building = buildingService.createBuilding("testBuilding");
+        buildingService.createWorkplace(workplace.getNumber(), workplace.getFloor());
+        buildingService.addWorkplacesToBuilding(building.getId(), List.of(workplace));
+        assertTrue(buildingService.doesWorkplaceExist(building.getWorkplaces().get(0).getId()));
+    }
 
     @Test
     public void createBuildingShouldReturnBuilding() {
