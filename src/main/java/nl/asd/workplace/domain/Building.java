@@ -50,14 +50,17 @@ public class Building {
     }
 
     public void addWorkplace(Workplace workplace) {
-        if (! this.workplaces.contains(workplace))
+        if (! this.workplaces.contains(workplace)) {
             this.workplaces.add(workplace);
+        }
     }
 
     public void addWorkplaces(List<Workplace> workplaces) {
-        for (Workplace workplace : workplaces)
-            if (! this.workplaces.contains(workplace))
+        for (Workplace workplace : workplaces) {
+            if (! this.workplaces.contains(workplace)) {
                 this.workplaces.add(workplace);
+            }
+        }
     }
 
     public void registerWorkplace(Workplace workplace) {
@@ -65,9 +68,11 @@ public class Building {
             throw new RuntimeException("This building already contains this workplace");
         }
 
-        for (Workplace workplace1 : this.workplaces)
-            if (workplace1.getId().equals(workplace.getId()))
+        for (Workplace workplace1 : this.workplaces) {
+            if (workplace1.getId().equals(workplace.getId())) {
                 throw new RuntimeException(MessageFormat.format("Workplace with id: {0} already exists", workplace1.getId()));
+            }
+        }
 
         this.workplaces.add(workplace);
     }
