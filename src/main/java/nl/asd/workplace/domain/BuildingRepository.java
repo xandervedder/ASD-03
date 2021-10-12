@@ -6,13 +6,15 @@ import nl.asd.shared.id.WorkplaceId;
 import java.util.List;
 
 public interface BuildingRepository {
-    Building ofId(BuildingId id);
+    Building ofBuildingId(BuildingId id);
 
     Building findByWorkplace(WorkplaceId id);
 
-    BuildingId nextId();
+    BuildingId nextBuildingId();
 
-    List<Building> findAll();
+    List<Building> findAllBuildings();
 
     void save(Building building);
+
+    WorkplaceId nextWorkplaceId();
 }

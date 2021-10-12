@@ -1,6 +1,5 @@
 package nl.asd.workplace.port.adapter;
 
-import nl.asd.reservation.domain.ReservationId;
 import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.domain.Building;
@@ -15,7 +14,7 @@ public class FakeBuildingRepository implements BuildingRepository {
     private long internalIncrementor = 0L;
 
     @Override
-    public Building ofId(BuildingId id) {
+    public Building ofBuildingId(BuildingId id) {
         return this.store.get(id);
     }
 
@@ -28,18 +27,24 @@ public class FakeBuildingRepository implements BuildingRepository {
     }
 
     @Override
-    public BuildingId nextId() {
+    public BuildingId nextBuildingId() {
         this.internalIncrementor++;
         return new BuildingId(this.internalIncrementor);
     }
 
     @Override
-    public List<Building> findAll() {
+    public List<Building> findAllBuildings() {
         return new ArrayList<>(this.store.values());
     }
 
     @Override
     public void save(Building building) {
         this.store.put(building.getId(), building);
+    }
+
+    @Override
+    public WorkplaceId nextWorkplaceId() {
+        this.internalIncrementor++;
+        return new WorkplaceId(this.internalIncrementor);
     }
 }

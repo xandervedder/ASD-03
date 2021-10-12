@@ -92,12 +92,12 @@ public class Reservation {
     }
 
     public void changeTimeslot(List<Timeslot> newSlots, ReservationRepository repository) {
-        //Changing a timeslot is not allowed on the day of the reservation
+        // Changing a timeslot is not allowed on the day of the reservation
         if (this.reservationDate.equals(LocalDate.now())) {
             throw new ChangeTimeslotNotAllowedException("Cannot change timeslot on the day of the actual reservation");
         }
 
-        //Changing a timeslot is not allowed of a reservation that is in the past
+        // Changing a timeslot is not allowed of a reservation that is in the past
         if (this.reservationDate.isBefore(LocalDate.now())) {
             throw new ChangeTimeslotNotAllowedException("Cannot change timeslot of a reservation in the past");
         }
@@ -164,7 +164,7 @@ public class Reservation {
         this.workplace = newWorkplaceId;
     }
 
-    //checks if the day of cancellation is not the same day as the reservation
+    // Checks if the day of cancellation is not the same day as the reservation
     public boolean isCancellationAllowed(LocalDate cancelDate) {
         return cancelDate.getYear() == this.reservationDate.getYear() &&
                 cancelDate.getDayOfYear() < this.reservationDate.getDayOfYear();

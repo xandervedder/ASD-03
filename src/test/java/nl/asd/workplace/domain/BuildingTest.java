@@ -1,6 +1,5 @@
 package nl.asd.workplace.domain;
 
-import com.sun.source.tree.AssertTree;
 import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.port.adapter.FakeBuildingRepository;
@@ -22,26 +21,20 @@ class BuildingTest {
     void initialize() {
         this.buildingRepository = new FakeBuildingRepository();
 
-        this.standardOpeningHours = new HashMap<DayOfWeek, OpeningTime>();
+        this.standardOpeningHours = new HashMap<>();
         this.standardOpeningHours.put(DayOfWeek.MONDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.TUESDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.WEDNESDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.THURSDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.FRIDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
-        this.standardOpeningHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
-        this.standardOpeningHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
 
-        this.building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
+        this.building = new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours, new Address("1234AB", "Kerelman", 13, ""));
         this.buildingRepository.save(this.building);
     }
 
     @Test
     void shouldCreateBuildingCorrectly() {
-        var numBuildings = this.buildingRepository.findAll().size();
-
-        this.buildingRepository.save(new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours));
-
-        assertEquals(numBuildings + 1, this.buildingRepository.findAll().size());
+        assertDoesNotThrow(() -> new Building(new BuildingId(1), "Test Building", this.standardOpeningHours, new Address("1234AB", "Kerelman", 13, "")));
     }
 
     @Test
