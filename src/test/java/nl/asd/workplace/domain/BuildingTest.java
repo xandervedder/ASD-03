@@ -1,7 +1,5 @@
 package nl.asd.workplace.domain;
 
-import com.sun.source.tree.AssertTree;
-import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.port.adapter.FakeBuildingRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,17 +29,17 @@ class BuildingTest {
         this.standardOpeningHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
 
-        this.building = new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours);
-        this.buildingRepository.save(this.building);
+        this.building = new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours);
+        this.buildingRepository.saveBuilding(this.building);
     }
 
     @Test
     void shouldCreateBuildingCorrectly() {
-        var numBuildings = this.buildingRepository.findAll().size();
+        var numBuildings = this.buildingRepository.findAllBuildings().size();
 
-        this.buildingRepository.save(new Building(this.buildingRepository.nextId(), "Test Building", this.standardOpeningHours));
+        this.buildingRepository.saveBuilding(new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours));
 
-        assertEquals(numBuildings + 1, this.buildingRepository.findAll().size());
+        assertEquals(numBuildings + 1, this.buildingRepository.findAllBuildings().size());
     }
 
     @Test

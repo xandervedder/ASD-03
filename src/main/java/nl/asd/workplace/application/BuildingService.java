@@ -5,7 +5,6 @@ import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.domain.Building;
 import nl.asd.workplace.domain.BuildingRepository;
 import nl.asd.workplace.domain.Workplace;
-import nl.asd.workplace.domain.WorkplaceRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,12 +12,9 @@ import java.util.List;
 
 public class BuildingService {
     private final BuildingRepository buildingRepository;
-    // Seperate service for workplace?
-    private final WorkplaceRepository workplaceRepository;
 
-    public BuildingService(BuildingRepository buildingRepository, WorkplaceRepository workplaceRepository) {
+    public BuildingService(BuildingRepository buildingRepository) {
         this.buildingRepository = buildingRepository;
-        this.workplaceRepository = workplaceRepository;
     }
 
     public boolean isTimeOutsideOfOpeningHoursForGivenDay(WorkplaceId id, LocalDate date, LocalTime from, LocalTime to) {
@@ -26,16 +22,16 @@ public class BuildingService {
         return building.isTimeOutsideOfOpeningHoursForGivenDay(from, to, date.getDayOfWeek());
     }
 
-    // Rename to doesBuildingContainWorkplace and then make a seperate method for doesWorkpalceExist?
+    // Rename to doesBuildingContainWorkplace and then make a seperate method for doesWorkplaceExist?
     public boolean doesWorkplaceExist(WorkplaceId workplaceId) {
         return this.buildingRepository.findByWorkplace(workplaceId) != null;
     }
 
-    // Avoid skip call
-    public boolean createWorkplace(int number, int floor) {
-        Workplace workplace = new Workplace(workplaceRepository.nextId(), number, floor);
-        this.workplaceRepository.save(workplace);
-        return doesWorkplaceExist(workplaceRepository.ofId(workplace.getId()).getId());
+    // Workplace always needs a building
+    public boolean createWorkplace(BuildingId id, int number, int floor) {
+        Workplace workplace = new Workplace(buildingRepository.nextWorkplaceId(), number, floor);
+        this.buildingRepository.saveWorkplace(id, workplace);
+        return doesWorkplaceExist(workplace.getId());
     }
 
     public Building createBuildingWithWorkplaces(String name, List<Workplace> workplaces) {
@@ -44,16 +40,16 @@ public class BuildingService {
     }
 
     public Building createBuilding(String name) {
-        Building building = new Building(buildingRepository.nextId(), name);
+        Building building = new Building(buildingRepository.nextBuildingId(), name);
         // In reality this would be bad, but this would be solved by using Spring which returns the instance on save
-        buildingRepository.save(building);
-        return buildingRepository.ofId(building.getId());
+        buildingRepository.saveBuilding(building);
+        return buildingRepository.ofBuildingId(building.getId());
     }
 
     public Building addWorkplacesToBuilding(BuildingId id, List<Workplace> workplaces) {
-        var building = buildingRepository.ofId(id);
+        var building = buildingRepository.ofBuildingId(id);
         building.addWorkplaces(workplaces);
-        buildingRepository.save(building);
-        return buildingRepository.ofId(building.getId());
+        buildingRepository.saveBuilding(building);
+        return buildingRepository.ofBuildingId(building.getId());
     }
 }

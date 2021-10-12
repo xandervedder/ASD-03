@@ -7,7 +7,6 @@ import nl.asd.shared.id.BuildingId;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.domain.*;
 import nl.asd.workplace.port.adapter.FakeBuildingRepository;
-import nl.asd.workplace.port.adapter.FakeWorkplaceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +24,6 @@ class BuildingServiceTest {
     private BuildingService buildingService;
     private ReservationService reservationService;
     private ReservationRepository reservationRepository;
-    private WorkplaceRepository workplaceRepository = new FakeWorkplaceRepository();
 
     private WorkplaceId workplaceId;
     private LocalDate reservationDate;
@@ -49,9 +47,9 @@ class BuildingServiceTest {
         this.to = LocalTime.of(13, 0);
 
         this.reservationRepository = new FakeReservationRepository();
-        this.reservationService = new ReservationService(this.reservationRepository, new BuildingService(buildingRepository, workplaceRepository));
+        this.reservationService = new ReservationService(this.reservationRepository, new BuildingService(buildingRepository));
         this.buildingRepository = new FakeBuildingRepository();
-        this.buildingService = new BuildingService(this.buildingRepository, workplaceRepository);
+        this.buildingService = new BuildingService(this.buildingRepository);
         this.workplace = new Workplace(workplaceId1, 0, 0);
 
         openingHours = new HashMap<>();
@@ -72,7 +70,7 @@ class BuildingServiceTest {
     @Test
     public void doesWorkplaceExistShouldReturnTrueIfWorkpalceDoesExist() {
         Building building = buildingService.createBuilding("testBuilding");
-        buildingService.createWorkplace(workplace.getNumber(), workplace.getFloor());
+        buildingService.createWorkplace(building.getId(), workplace.getNumber(), workplace.getFloor());
         buildingService.addWorkplacesToBuilding(building.getId(), List.of(workplace));
         assertTrue(buildingService.doesWorkplaceExist(building.getWorkplaces().get(0).getId()));
     }
