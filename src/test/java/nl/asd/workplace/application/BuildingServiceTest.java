@@ -69,51 +69,51 @@ class BuildingServiceTest {
 
     @Test
     public void doesWorkplaceExistShouldReturnTrueIfWorkpalceDoesExist() {
-        Building building = buildingService.createBuilding("testBuilding");
-        buildingService.createWorkplace(building.getId(), workplace.getNumber(), workplace.getFloor());
+        Building building = buildingService.addBuilding("testBuilding");
+        buildingService.addWorkplace(building.getId(), workplace.getNumber(), workplace.getFloor());
         buildingService.addWorkplacesToBuilding(building.getId(), List.of(workplace));
         assertTrue(buildingService.doesWorkplaceExist(building.getWorkplaces().get(0).getId()));
     }
 
     @Test
     public void createBuildingShouldReturnBuilding() {
-        assertEquals(Building.class, buildingService.createBuilding("testBuilding").getClass());
+        assertEquals(Building.class, buildingService.addBuilding("testBuilding").getClass());
     }
 
     @Test
     public void createBuildingShouldReturnValidBuildingId() {
-        assertEquals(new BuildingId(1), buildingService.createBuilding("testBuilding").getId());
-        assertEquals(new BuildingId(2), buildingService.createBuilding("testBuilding1").getId());
-        assertEquals(new BuildingId(3), buildingService.createBuilding("testBuilding2").getId());
+        assertEquals(new BuildingId(1), buildingService.addBuilding("testBuilding").getId());
+        assertEquals(new BuildingId(2), buildingService.addBuilding("testBuilding1").getId());
+        assertEquals(new BuildingId(3), buildingService.addBuilding("testBuilding2").getId());
     }
 
     @Test
     public void createBuildingShouldMakeDefaultWorkdayHashMapWhenOnlyANameIsSupplied() {
-        assertEquals(openingHours, buildingService.createBuilding("testBuilding").getOpeningHours());
+        assertEquals(openingHours, buildingService.addBuilding("testBuilding").getOpeningHours());
     }
 
     @Test
     public void createBuildingShouldHaveEmptyWorkplaceArray() {
-        assertEquals(0, buildingService.createBuilding("testBuilding").getWorkplaces().size());
+        assertEquals(0, buildingService.addBuilding("testBuilding").getWorkplaces().size());
     }
 
     @Test
     public void addWorkplacesToBuildingShouldAddWorkplacesToBuilding() {
-        Building building = buildingService.createBuilding("testBuilding");
+        Building building = buildingService.addBuilding("testBuilding");
         building.addWorkplaces(List.of(new Workplace(workplaceId, 1, 1)));
         assertEquals(1, building.getWorkplaces().size());
     }
 
     @Test
     public void AddWorkplacesToBuildingViaGetterShouldNotAddWorkplaces() {
-        Building building = buildingService.createBuilding("testBuilding");
+        Building building = buildingService.addBuilding("testBuilding");
         assertThrows(UnsupportedOperationException.class,
                 () -> building.getWorkplaces().add(new Workplace(workplaceId, 1, 1)));
     }
 
     @Test
     public void addWorkplacesToBuildingShouldAdd() {
-        Building building = buildingService.createBuilding("testBuilding");
+        Building building = buildingService.addBuilding("testBuilding");
         buildingService.addWorkplacesToBuilding(building.getId(), List.of(workplace));
         assertEquals(1, building.getWorkplaces().size());
     }

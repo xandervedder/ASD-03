@@ -11,40 +11,42 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class BuildingService {
-    private final BuildingRepository buildingRepository;
+    private final BuildingRepository repository;
 
     public BuildingService(BuildingRepository buildingRepository) {
-        this.buildingRepository = buildingRepository;
+        this.repository = buildingRepository;
     }
 
     public boolean isTimeOutsideOfOpeningHoursForGivenDay(WorkplaceId id, LocalDate date, LocalTime from, LocalTime to) {
-        var building = buildingRepository.findByWorkplace(id);
+        var building = repository.findByWorkplace(id);
         return building.isTimeOutsideOfOpeningHoursForGivenDay(from, to, date.getDayOfWeek());
     }
 
-    // Rename to doesBuildingContainWorkplace and then make a seperate method for doesWorkplaceExist?
+    // Rename to doesBuildingContainWorkplace and then make a separate method for doesWorkplaceExist?
     public boolean doesWorkplaceExist(WorkplaceId workplaceId) {
-        return this.buildingRepository.findByWorkplace(workplaceId) != null;
+        return this.repository.findByWorkplace(workplaceId) != null;
     }
 
     // Workplace always needs a building
-    public boolean createWorkplace(BuildingId id, int number, int floor) {
-        Workplace workplace = new Workplace(buildingRepository.nextWorkplaceId(), number, floor);
-        this.buildingRepository.saveWorkplace(id, workplace);
-        return doesWorkplaceExist(workplace.getId());
+    public WorkplaceId addWorkplace(BuildingId id, int number, int floor) {
+        Workplace workplace = new Workplace(repository.nextWorkplaceId(), number, floor);
+        Building building = repository.ofBuildingId(id);
+        building.addWorkplace(workplace);
+        this.repository.saveBuilding(building);
+        return workplace.getId();
     }
 
-    public Building createBuilding(String name) {
-        Building building = new Building(buildingRepository.nextBuildingId(), name);
+    public Building addBuilding(String name) {
+        Building building = new Building(repository.nextBuildingId(), name);
         // In reality this would be bad, but this would be solved by using Spring which returns the instance on save
-        buildingRepository.saveBuilding(building);
-        return buildingRepository.ofBuildingId(building.getId());
+        repository.saveBuilding(building);
+        return repository.ofBuildingId(building.getId());
     }
 
     public Building addWorkplacesToBuilding(BuildingId id, List<Workplace> workplaces) {
-        var building = buildingRepository.ofBuildingId(id);
+        var building = repository.ofBuildingId(id);
         building.addWorkplaces(workplaces);
-        buildingRepository.saveBuilding(building);
-        return buildingRepository.ofBuildingId(building.getId());
+        repository.saveBuilding(building);
+        return repository.ofBuildingId(building.getId());
     }
 }

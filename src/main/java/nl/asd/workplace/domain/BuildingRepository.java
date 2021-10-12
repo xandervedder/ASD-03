@@ -16,9 +16,5 @@ public interface BuildingRepository {
 
     void saveBuilding(Building building);
 
-    List<Workplace> findAllWorkplacesForBuilding(BuildingId id);
-
-    void saveWorkplace(BuildingId id, Workplace workplace);
-
     WorkplaceId nextWorkplaceId();
 }
