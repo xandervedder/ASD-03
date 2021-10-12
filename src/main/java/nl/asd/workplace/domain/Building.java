@@ -50,14 +50,14 @@ public class Building {
     }
 
     public void addWorkplace(Workplace workplace) {
-        if (! this.workplaces.contains(workplace)) {
+        if (!this.workplaces.contains(workplace)) {
             this.workplaces.add(workplace);
         }
     }
 
     public void addWorkplaces(List<Workplace> workplaces) {
         for (Workplace workplace : workplaces) {
-            if (! this.workplaces.contains(workplace)) {
+            if (!this.workplaces.contains(workplace)) {
                 this.workplaces.add(workplace);
             }
         }
@@ -79,7 +79,7 @@ public class Building {
 
     public boolean isTimeOutsideOfOpeningHoursForGivenDay(LocalTime from, LocalTime to, DayOfWeek day) {
         var openingTimeForDay = this.openingHours.get(day);
-        return ! (openingTimeForDay.from().isBefore(to) && from.isBefore(openingTimeForDay.to()));
+        return !(openingTimeForDay.from().isBefore(to) && from.isBefore(openingTimeForDay.to()));
     }
 
     public BuildingId getId() {
