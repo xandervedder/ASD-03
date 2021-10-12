@@ -45,7 +45,7 @@ class ReservationServiceTest {
      * @return Time normalized to zero minutes
      */
     private LocalTime time() {
-        return LocalTime.now().withMinute(0);
+        return LocalTime.now().withHour(10).withMinute(0);
     }
 
     @BeforeEach

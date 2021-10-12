@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +23,7 @@ class ReservationTest {
      * @return Time normalized to zero minutes
      */
     private LocalTime time() {
-        return LocalTime.now().withMinute(0);
+        return LocalTime.now().withHour(10).withMinute(0);
     }
 
     @BeforeEach
@@ -182,11 +183,9 @@ class ReservationTest {
 
     @Test
     public void changingTimeslotOnTheDayOfTheReservationShouldThrowException() {
-        var time = LocalTime.now().withMinute(0);
-
-        var newTimeslot1 = new Timeslot(time.plusMinutes(90), time.plusMinutes(120));
-        var newTimeslot2 = new Timeslot(time.plusMinutes(120), time.plusMinutes(150));
-        var newTimeslot3 = new Timeslot(time.plusMinutes(150), time.plusMinutes(180));
+        var newTimeslot1 = new Timeslot(time().plusMinutes(90), time().plusMinutes(120));
+        var newTimeslot2 = new Timeslot(time().plusMinutes(120), time().plusMinutes(150));
+        var newTimeslot3 = new Timeslot(time().plusMinutes(150), time().plusMinutes(180));
 
         var reservation = new Reservation(new ReservationId(0L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(5));
 
