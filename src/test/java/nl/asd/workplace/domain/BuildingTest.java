@@ -29,7 +29,7 @@ class BuildingTest {
         this.standardOpeningHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         this.standardOpeningHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
 
-        this.building = new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours);
+        this.building = new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours, new Address("1234AB", "Kerelman", 13, ""));
         this.buildingRepository.saveBuilding(this.building);
     }
 
@@ -37,7 +37,7 @@ class BuildingTest {
     void shouldCreateBuildingCorrectly() {
         var numBuildings = this.buildingRepository.findAllBuildings().size();
 
-        this.buildingRepository.saveBuilding(new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours));
+        this.buildingRepository.saveBuilding(new Building(this.buildingRepository.nextBuildingId(), "Test Building", this.standardOpeningHours, new Address("1234AB", "Kerelman", 13, "")));
 
         assertEquals(numBuildings + 1, this.buildingRepository.findAllBuildings().size());
     }

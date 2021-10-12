@@ -7,6 +7,7 @@ import nl.asd.shared.exception.ChangeTimeslotNotAllowedException;
 import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
+import nl.asd.workplace.domain.Address;
 import nl.asd.workplace.domain.Building;
 import nl.asd.workplace.domain.OpeningTime;
 import nl.asd.workplace.domain.Workplace;
@@ -59,7 +60,7 @@ class ReservationServiceTest {
         openingHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         openingHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
 
-        var building = new Building(buildingRepository.nextBuildingId(), "Test Building", openingHours);
+        var building = new Building(buildingRepository.nextBuildingId(), "Test Building", openingHours, new Address("1234AB", "Kerelman", 13, ""));
         building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
         building.registerWorkplace(new Workplace(new WorkplaceId(2L), 2, 1));
         buildingRepository.saveBuilding(building);
