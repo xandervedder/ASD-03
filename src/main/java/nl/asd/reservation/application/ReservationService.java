@@ -36,7 +36,6 @@ public class ReservationService {
         reservation.reserveTimeslots(timeslots, this.repository);
         this.repository.save(reservation);
 
-        // Mag dit?
         return reservation.getId();
     }
 
