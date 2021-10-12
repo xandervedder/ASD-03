@@ -1,4 +1,4 @@
-package nl.asd.reservation;
+package nl.asd.shared.exception;
 
 public class ChangeTimeslotNotAllowedException extends  RuntimeException{
     public ChangeTimeslotNotAllowedException(String message) {

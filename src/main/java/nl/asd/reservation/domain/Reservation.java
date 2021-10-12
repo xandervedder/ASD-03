@@ -1,6 +1,6 @@
 package nl.asd.reservation.domain;
 
-import nl.asd.reservation.ChangeTimeslotNotAllowedException;
+import nl.asd.shared.exception.ChangeTimeslotNotAllowedException;
 import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
