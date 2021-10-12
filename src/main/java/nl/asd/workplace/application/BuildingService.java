@@ -34,11 +34,6 @@ public class BuildingService {
         return doesWorkplaceExist(workplace.getId());
     }
 
-    public Building createBuildingWithWorkplaces(String name, List<Workplace> workplaces) {
-        Building building = createBuilding(name);
-        return addWorkplacesToBuilding(building.getId(), workplaces);
-    }
-
     public Building createBuilding(String name) {
         Building building = new Building(buildingRepository.nextBuildingId(), name);
         // In reality this would be bad, but this would be solved by using Spring which returns the instance on save
