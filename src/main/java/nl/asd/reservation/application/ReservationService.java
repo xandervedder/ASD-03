@@ -42,8 +42,9 @@ public class ReservationService {
 
     public void changeTimeslotForExistingReservation(ReservationId reservationId, List<Timeslot> newTimeslots) {
         var reservation = this.repository.ofId(reservationId);
-        if (reservation == null)
+        if (reservation == null) {
             throw new ReservationNotFoundException("The reservation is not found");
+        }
         reservation.changeTimeslot(newTimeslots, this.repository);
 
         this.repository.save(reservation);
@@ -51,11 +52,13 @@ public class ReservationService {
 
     public void cancelReservation(ReservationId reservationId) {
         var reservation = this.repository.ofId(reservationId);
-        if (reservation == null)
+        if (reservation == null) {
             throw new ReservationNotFoundException("The reservation is not found");
+        }
 
-        if (!reservation.isCancellationAllowed(LocalDate.now()))
+        if (!reservation.isCancellationAllowed(LocalDate.now())) {
             throw new CancellationNotAllowedException("Reservation cannot be cancelled on the same day");
+        }
 
         this.repository.delete(reservation);
     }

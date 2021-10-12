@@ -92,7 +92,7 @@ public class Reservation {
 
     public void changeTimeslot(List<Timeslot> newSlots, ReservationRepository repository) {
         var copy = new ArrayList<>(newSlots);
-        reserveTimeslots(copy, repository);
+        this.reserveTimeslots(copy, repository);
         this.slots = copy;
     }
 
