@@ -1,9 +1,10 @@
 package nl.asd.reservation.application;
 
-import nl.asd.shared.exception.CancellationNotAllowedException;
-import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.reservation.domain.*;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
+import nl.asd.shared.exception.CancellationNotAllowedException;
+import nl.asd.shared.exception.ChangeTimeslotNotAllowedException;
+import nl.asd.shared.exception.ReservationNotFoundException;
 import nl.asd.shared.id.WorkplaceId;
 import nl.asd.workplace.application.BuildingService;
 import nl.asd.workplace.domain.Building;
@@ -29,6 +30,13 @@ class ReservationServiceTest {
     private LocalDate reservationDate;
     private LocalTime from;
     private LocalTime to;
+
+    private LocalTime from1;
+    private LocalTime from2;
+    private LocalTime from3;
+    private LocalTime to1;
+    private LocalTime to2;
+    private LocalTime to3;
 
     /**
      * Helper method that reduces code bloat and increases readability
@@ -60,6 +68,13 @@ class ReservationServiceTest {
         this.reservationDate = LocalDate.now().plusDays(1);
         this.from = LocalTime.of(12, 30);
         this.to = LocalTime.of(13, 0);
+
+        this.from1 = this.from.plusMinutes(90);
+        this.from2 = this.from.plusMinutes(120);
+        this.from3 = this.from.plusMinutes(150);
+        this.to1 = this.to.plusMinutes(90);
+        this.to2 = this.to.plusMinutes(120);
+        this.to3 = this.to.plusMinutes(150);
 
         this.repository = new FakeReservationRepository();
         this.service = new ReservationService(this.repository, new BuildingService(buildingRepository));
@@ -104,6 +119,18 @@ class ReservationServiceTest {
     }
 
     @Test
+    public void shouldChangeTimeslotsCorrectly() {
+        var id = this.service.reserveWorkplace(this.workplace, this.reservationDate, List.of(new Timeslot(this.from, this.to)));
+
+        var newTimeslot1 = new Timeslot(this.from1, this.to1);
+        var newTimeslot2 = new Timeslot(this.from2, this.to2);
+        var newTimeslot3 = new Timeslot(this.from3, this.to3);
+
+        this.service.changeTimeslotForExistingReservation(id, List.of(newTimeslot1, newTimeslot2, newTimeslot3));
+        assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), repository.ofId(id).getSlots());
+    }
+
+    @Test
     public void shouldChangeWorkplaceCorrectly() {
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(1L));
         reservation.reserveTimeslot(new Timeslot(time(), time().plusMinutes(30)), this.repository);
@@ -134,5 +161,25 @@ class ReservationServiceTest {
         this.repository.save(reservation2);
 
         assertThrows(RuntimeException.class, () -> this.service.migrateReservationToNewWorkplace(reservation.getId(), new WorkplaceId(2)));
+    }
+
+    @Test
+    public void shouldThrowWhenChangingATimeslotOnTheDayOfTheReservation() {
+        var id = this.service.reserveWorkplace(this.workplace, LocalDate.now(), List.of(new Timeslot(this.from, this.to)));
+
+        var newTimeslot1 = new Timeslot(this.from1, this.to1);
+        var newTimeslot2 = new Timeslot(this.from2, this.to2);
+        var newTimeslot3 = new Timeslot(this.from3, this.to3);
+
+        assertThrows(ChangeTimeslotNotAllowedException.class, () -> this.service.changeTimeslotForExistingReservation(id, List.of(newTimeslot1, newTimeslot2, newTimeslot3)));
+    }
+
+    @Test
+    public void changeTimeslotOfNonExistingReservationShouldThrowException() {
+        var newTimeslot1 = new Timeslot(this.from1, this.to1);
+        var newTimeslot2 = new Timeslot(this.from2, this.to2);
+        var newTimeslot3 = new Timeslot(this.from3, this.to3);
+
+        assertThrows(ReservationNotFoundException.class, () -> this.service.changeTimeslotForExistingReservation(new ReservationId(1000L), List.of(newTimeslot1, newTimeslot2, newTimeslot3)));
     }
 }

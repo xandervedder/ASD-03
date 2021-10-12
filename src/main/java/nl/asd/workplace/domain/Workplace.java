@@ -2,7 +2,6 @@ package nl.asd.workplace.domain;
 
 import nl.asd.shared.id.WorkplaceId;
 
-import java.util.List;
 import java.util.Objects;
 
 public class Workplace {

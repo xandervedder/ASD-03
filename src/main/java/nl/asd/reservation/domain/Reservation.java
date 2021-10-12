@@ -1,5 +1,6 @@
 package nl.asd.reservation.domain;
 
+import nl.asd.shared.exception.ChangeTimeslotNotAllowedException;
 import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
@@ -9,8 +10,8 @@ import java.util.List;
 
 public class Reservation {
     private final LocalDate createdAt;
-    private final List<Timeslot> slots;
 
+    private List<Timeslot> slots;
     private ReservationId id;
     private LocalDate reservationDate;
     private ReservationType type;
@@ -18,8 +19,8 @@ public class Reservation {
 
     public Reservation(ReservationId id, LocalDate reservationDate, ReservationType type, WorkplaceId workplace) {
         this.createdAt = LocalDate.now();
-        this.slots = new ArrayList<>();
 
+        this.slots = new ArrayList<>();
         this.setId(id);
         this.setReservationDate(reservationDate);
         this.setType(type);
@@ -52,7 +53,7 @@ public class Reservation {
         }
 
         if (reservationDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Reseration date cannot be in the past");
+            throw new IllegalArgumentException("Reservation date cannot be in the past");
         }
 
         this.reservationDate = reservationDate;
@@ -88,6 +89,22 @@ public class Reservation {
 
     public long totalMinutesReserved() {
         return slots.stream().map(Timeslot::minutes).reduce(0L, Long::sum);
+    }
+
+    public void changeTimeslot(List<Timeslot> newSlots, ReservationRepository repository) {
+        //Changing a timeslot is not allowed on the day of the reservation
+        if (this.reservationDate.equals(LocalDate.now())) {
+            throw new ChangeTimeslotNotAllowedException("Cannot change timeslot on the day of the actual reservation");
+        }
+
+        //Changing a timeslot is not allowed of a reservation that is in the past
+        if (this.reservationDate.isBefore(LocalDate.now())) {
+            throw new ChangeTimeslotNotAllowedException("Cannot change timeslot of a reservation in the past");
+        }
+
+        var copy = new ArrayList<>(newSlots);
+        this.reserveTimeslots(copy, repository);
+        this.slots = copy;
     }
 
     public void reserveTimeslot(Timeslot timeslot, ReservationRepository repository) {

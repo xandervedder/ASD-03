@@ -38,7 +38,7 @@ public record Timeslot(LocalTime from, LocalTime to) {
     public static List<Timeslot> ofTimeRange(LocalTime from, LocalTime to) {
         // Not actually used, but it will stay in the codebase to serve as an example
         if (from.equals(to)) {
-            throw new IllegalArgumentException("A timerange has to exist");
+            throw new IllegalArgumentException("A time range has to exist");
         }
 
         if (from.isAfter(to)) {

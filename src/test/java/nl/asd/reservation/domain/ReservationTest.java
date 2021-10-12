@@ -1,5 +1,6 @@
 package nl.asd.reservation.domain;
 
+import nl.asd.shared.exception.ChangeTimeslotNotAllowedException;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 import org.junit.jupiter.api.AfterEach;
@@ -158,5 +159,37 @@ class ReservationTest {
         var reservation = new Reservation(new ReservationId(1L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(1));
 
         assertDoesNotThrow(() -> reservation.reserveTimeslot(new Timeslot(time().minusMinutes(90), time().minusMinutes(60)), this.repository));
+    }
+
+    @Test
+    public void shouldChangeTimeslotsCorrectly() {
+        var reservation = new Reservation(new ReservationId(0L), LocalDate.now().plusDays(1), ReservationType.ONCE, new WorkplaceId(5));
+
+        var oldTimeslot1 = new Timeslot(time(), time().plusMinutes(30));
+        var oldTimeslot2 = new Timeslot(time().plusMinutes(30), time().plusMinutes(60));
+        var oldTimeslot3 = new Timeslot(time().plusMinutes(60), time().plusMinutes(90));
+
+        reservation.reserveTimeslots(List.of(oldTimeslot1, oldTimeslot2, oldTimeslot3), this.repository);
+
+        var newTimeslot1 = new Timeslot(time().plusMinutes(90), time().plusMinutes(120));
+        var newTimeslot2 = new Timeslot(time().plusMinutes(120), time().plusMinutes(150));
+        var newTimeslot3 = new Timeslot(time().plusMinutes(150), time().plusMinutes(180));
+
+        reservation.changeTimeslot(List.of(newTimeslot1, newTimeslot2, newTimeslot3), this.repository);
+
+        assertEquals(List.of(newTimeslot1, newTimeslot2, newTimeslot3), reservation.getSlots());
+    }
+
+    @Test
+    public void changingTimeslotOnTheDayOfTheReservationShouldThrowException() {
+        var time = LocalTime.now().withMinute(0);
+
+        var newTimeslot1 = new Timeslot(time.plusMinutes(90), time.plusMinutes(120));
+        var newTimeslot2 = new Timeslot(time.plusMinutes(120), time.plusMinutes(150));
+        var newTimeslot3 = new Timeslot(time.plusMinutes(150), time.plusMinutes(180));
+
+        var reservation = new Reservation(new ReservationId(0L), LocalDate.now(), ReservationType.ONCE, new WorkplaceId(5));
+
+        assertThrows(ChangeTimeslotNotAllowedException.class, () -> reservation.changeTimeslot(List.of(newTimeslot1, newTimeslot2, newTimeslot3), repository));
     }
 }
