@@ -22,7 +22,6 @@ public class ReservationService {
     public ReservationId reserveWorkplace(WorkplaceId workplace, LocalDate reservationDate, List<Timeslot> timeslots) {
         // Check for each time range if it is outside the openings hours
         for (var slot : timeslots) {
-            // Throw here or at buildingService...?
             if (this.buildingService.isTimeOutsideOfOpeningHoursForGivenDay(workplace, reservationDate, slot.from(), slot.to())) {
                 throw new RuntimeException("Given time is not within opening hours range");
             }

@@ -15,71 +15,33 @@ import java.util.stream.Stream;
 
 
 public class Building {
+    private final List<Workplace> workplaces;
+
     private BuildingId id;
     private String name;
     private Address address;
     private HashMap<DayOfWeek, OpeningTime> openingHours;
-    private final List<Workplace> workplaces;
 
-
-    //TODO: overload this to second constructor
     public Building(BuildingId id, String name, Address address) {
         this(id, name, standardOpeningHours(), address);
     }
 
     public Building(BuildingId id, String name, HashMap<DayOfWeek, OpeningTime> openingHours, Address address) {
-        this.id = id;
+        this.workplaces = new ArrayList<>();
+
+        this.setId(id);
         this.setName(name);
         this.setAddress(address);
-        setOpeningHours(openingHours);
-        this.workplaces = new ArrayList<>();
+        this.setOpeningHours(openingHours);
     }
-
-    /**
-     * @return HashMap with days: Mo-Fr | OpeningHours: 08:00-18:00
-     */
-    private static HashMap<DayOfWeek, OpeningTime> standardOpeningHours() {
-        return Stream.of(getDayOfWeeks()).collect(Collectors.toMap(dayOfWeek -> dayOfWeek, dayOfWeek -> new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)), (a, b) -> b, HashMap::new));
-    }
-
-    private static DayOfWeek[] getDayOfWeeks() {
-        return new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY};
-    }
-
-    public boolean includesWorkplace(WorkplaceId id) {
-        return this.workplaces.stream().anyMatch(w -> w.getId().equals(id));
-    }
-
-    public void registerWorkplace(Workplace workplace) {
-        if (this.workplaces.contains(workplace)) {
-            throw new RuntimeException("This building already contains this workplace");
-        }
-
-        for (Workplace workplace1 : this.workplaces) {
-            if (workplace1.getId().equals(workplace.getId())) {
-                throw new RuntimeException(MessageFormat.format("Workplace with id: {0} already exists", workplace1.getId()));
-            }
-        }
-
-        this.workplaces.add(workplace);
-    }
-
-    public void registerWorkplaces(List<Workplace> workplaces) {
-        for (Workplace workplace : workplaces) {
-            registerWorkplace(workplace);
-        }
-    }
-
-    public boolean isTimeOutsideOfOpeningHoursForGivenDay(LocalTime from, LocalTime to, DayOfWeek day) {
-        var openingTimeForDay = this.openingHours.get(day);
-        return !(openingTimeForDay.from().isBefore(to) && from.isBefore(openingTimeForDay.to()));
-    }
-
 
     public void setId(BuildingId id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Building id cannot be null");
+        }
+
         this.id = id;
     }
-
 
     public void setName(String name) {
         if (name.length() < 2) {
@@ -97,11 +59,15 @@ public class Building {
 
     public void setOpeningHours(HashMap<DayOfWeek, OpeningTime> openingHours) {
         if (openingHours == null) {
-            throw new RuntimeException("Openinghours cannot be null");
+            throw new IllegalArgumentException("Openinghours cannot be null");
         }
 
         if (openingHours.entrySet().size() == 0) {
-            throw new RuntimeException("Openinghours cannot be null");
+            throw new IllegalArgumentException("Openinghours cannot be empty");
+        }
+
+        if (openingHours.containsKey(DayOfWeek.SATURDAY) || openingHours.containsKey(DayOfWeek.SUNDAY)) {
+            throw new IllegalArgumentException("Building cannot be open in weekends");
         }
 
         this.openingHours = openingHours;
@@ -110,7 +76,6 @@ public class Building {
     public List<Workplace> getWorkplaces() {
         return Collections.unmodifiableList(workplaces);
     }
-
 
     public void setAddress(Address address) {
         this.address = address;
@@ -124,12 +89,45 @@ public class Building {
         return name;
     }
 
-
     public Address getAddress() {
         return address;
     }
 
     public HashMap<DayOfWeek, OpeningTime> getOpeningHours() {
         return openingHours;
+    }
+
+    /**
+     * @return HashMap with days: Mo-Fr | OpeningHours: 08:00-18:00
+     */
+    public static HashMap<DayOfWeek, OpeningTime> standardOpeningHours() {
+        return Stream.of(getWorkDays()).collect(Collectors.toMap(dayOfWeek -> dayOfWeek, dayOfWeek -> new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)), (a, b) -> b, HashMap::new));
+    }
+
+    private static DayOfWeek[] getWorkDays() {
+        return new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY};
+    }
+
+    public boolean includesWorkplace(WorkplaceId id) {
+        return this.workplaces.stream().anyMatch(w -> w.getId().equals(id));
+    }
+
+    public void registerWorkplace(Workplace workplace) {
+        if (this.workplaces.contains(workplace)) {
+            throw new RuntimeException("This building already contains this workplace");
+        }
+
+        this.workplaces.add(workplace);
+    }
+
+    public void registerWorkplaces(List<Workplace> workplaces) {
+        for (var workplace : workplaces) {
+            this.registerWorkplace(workplace);
+        }
+    }
+
+    public boolean isTimeOutsideOfOpeningHoursForGivenDay(LocalTime from, LocalTime to, DayOfWeek day) {
+        var openingTimeForDay = this.openingHours.get(day);
+        return !(openingTimeForDay.from().isBefore(to) && from.isBefore(openingTimeForDay.to()));
     }
 }

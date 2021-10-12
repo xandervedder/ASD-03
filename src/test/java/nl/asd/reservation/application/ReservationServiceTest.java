@@ -57,13 +57,11 @@ class ReservationServiceTest {
         openingHours.put(DayOfWeek.WEDNESDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         openingHours.put(DayOfWeek.THURSDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
         openingHours.put(DayOfWeek.FRIDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
-        openingHours.put(DayOfWeek.SATURDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
-        openingHours.put(DayOfWeek.SUNDAY, new OpeningTime(LocalTime.of(8, 0), LocalTime.of(18, 0)));
 
         var building = new Building(buildingRepository.nextBuildingId(), "Test Building", openingHours, new Address("1234AB", "Kerelman", 13, ""));
         building.registerWorkplace(new Workplace(new WorkplaceId(1L), 1, 1));
         building.registerWorkplace(new Workplace(new WorkplaceId(2L), 2, 1));
-        buildingRepository.saveBuilding(building);
+        buildingRepository.save(building);
 
         this.workplace = new WorkplaceId(1L);
         this.reservationDate = LocalDate.now().plusDays(1);

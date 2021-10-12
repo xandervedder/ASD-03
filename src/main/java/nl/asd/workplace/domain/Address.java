@@ -4,37 +4,32 @@ package nl.asd.workplace.domain;
 public record Address(String postalCode, String streetName, int houseNumber, String addition) {
     public Address {
         if (postalCode == null) {
-            throw new RuntimeException("Postalcode cannot be null");
+            throw new IllegalArgumentException("Postalcode cannot be null");
         }
-        if (postalCode.length() > 6) {
-            throw new RuntimeException("Postalcode has an invalid length");
+
+        if (postalCode.length() > 6 || postalCode.length() < 4) {
+            throw new IllegalArgumentException("Postalcode has an invalid length");
+        }
+
+        if (streetName == null) {
+            throw new IllegalArgumentException("Streetname cannot be null");
         }
 
         char[] charArray = postalCode.toCharArray();
         for (int i = 0; i < charArray.length; i++) {
             char c = charArray[i];
-            if (i <= 3) {
-                if (!Character.isDigit(c)) {
-                    throw new RuntimeException("Postalcode has an invalid composition");
-                }
-            } else if (!Character.isAlphabetic(c)) {
-                throw new RuntimeException("Postalcode has an invalid composition");
+            if (i < 4 && !Character.isDigit(c)) {
+                throw new IllegalArgumentException("Postalcode has an invalid composition");
+
+            }
+            if (i > 4 && !Character.isAlphabetic(c)) {
+                throw new IllegalArgumentException("Postalcode has an invalid composition");
             }
         }
 
         for (char c : streetName.toCharArray()) {
             if (!Character.isAlphabetic(c)) {
-                throw new RuntimeException("Streetname has invalid characters");
-            }
-        }
-
-        if (String.valueOf(houseNumber).toCharArray()[0] == 0) {
-            throw new RuntimeException("Housenumber cannot start with 0");
-        }
-
-        for (char c : addition.toCharArray()) {
-            if (!Character.isAlphabetic(c) && !Character.isDigit(c) && !Character.isSpaceChar(c)) {
-                throw new RuntimeException("Invalid addition");
+                throw new IllegalArgumentException("Streetname has invalid characters");
             }
         }
     }

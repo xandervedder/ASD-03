@@ -38,7 +38,7 @@ public class FakeBuildingRepository implements BuildingRepository {
     }
 
     @Override
-    public void saveBuilding(Building building) {
+    public void save(Building building) {
         this.store.put(building.getId(), building);
     }
 
