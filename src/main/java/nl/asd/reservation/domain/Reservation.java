@@ -1,11 +1,13 @@
 package nl.asd.reservation.domain;
 
+import nl.asd.reservation.ChangeTimeslotNotAllowedException;
 import nl.asd.shared.id.WorkplaceId;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Reservation {
     private final LocalDate createdAt;
@@ -91,6 +93,16 @@ public class Reservation {
     }
 
     public void changeTimeslot(List<Timeslot> newSlots, ReservationRepository repository) {
+        //Changing a timeslot is not allowed on the day of the reservation
+        if (this.reservationDate.equals(LocalDate.now())) {
+            throw new ChangeTimeslotNotAllowedException("Cannot change timeslot on the day of the actual reservation");
+        }
+
+        //Changing a timeslot is not allowed of a reservation that is in the past
+        if (this.reservationDate.isBefore(LocalDate.now())) {
+            throw new ChangeTimeslotNotAllowedException("Cannot change timeslot of a reservation in the past");
+        }
+
         var copy = new ArrayList<>(newSlots);
         this.reserveTimeslots(copy, repository);
         this.slots = copy;
