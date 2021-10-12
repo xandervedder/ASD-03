@@ -1,7 +1,6 @@
 package nl.asd.reservation.domain;
 
 import nl.asd.reservation.ChangeTimeslotNotAllowedException;
-import nl.asd.reservation.ReservationNotFoundException;
 import nl.asd.reservation.port.adapter.FakeReservationRepository;
 import nl.asd.shared.id.WorkplaceId;
 import org.junit.jupiter.api.AfterEach;
